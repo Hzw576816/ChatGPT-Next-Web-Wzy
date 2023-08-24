@@ -5,7 +5,9 @@ require("../polyfill");
 import { useState, useEffect } from "react";
 
 import styles from "./home.module.scss";
+import NextImage from "next/image";
 
+import ChatBotIcon from "../icons/ai-chat-bot.png";
 import BotIcon from "../icons/bot.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 
@@ -28,31 +30,50 @@ import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
 import { api } from "../client/api";
-import { useAccessStore } from "../store";
+import { useAccessStore, useWebsiteConfigStore } from "../store";
 
-export function Loading(props: { noLogo?: boolean }) {
+export function Loading(props: {
+  noLogo?: boolean;
+  logoLoading: boolean;
+  logoUrl?: string;
+}) {
+  const logoLoading = props.logoLoading;
+  const logoUrl = props.logoUrl;
+  const noLogo = props.noLogo;
   return (
     <div className={styles["loading-content"] + " no-dark"}>
-      {!props.noLogo && <BotIcon />}
+      {!props.noLogo && (
+        <NextImage
+          src={ChatBotIcon.src}
+          width={30}
+          height={30}
+          alt="bot"
+          className="user-avatar"
+        />
+      )}
       <LoadingIcon />
     </div>
   );
 }
 
+const Login = dynamic(async () => (await import("./login")).Login, {
+  loading: () => <Loading noLogo logoLoading />,
+});
+
 const Settings = dynamic(async () => (await import("./settings")).Settings, {
-  loading: () => <Loading noLogo />,
+  loading: () => <Loading noLogo logoLoading />,
 });
 
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
-  loading: () => <Loading noLogo />,
+  loading: () => <Loading noLogo logoLoading />,
 });
 
 const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
-  loading: () => <Loading noLogo />,
+  loading: () => <Loading noLogo logoLoading />,
 });
 
 const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
-  loading: () => <Loading noLogo />,
+  loading: () => <Loading noLogo logoLoading />,
 });
 
 export function useSwitchTheme() {
@@ -119,7 +140,24 @@ const loadAsyncGoogleFont = () => {
   document.head.appendChild(linkEl);
 };
 
-function Screen() {
+function setFavicon(url: string, mimeType: string) {
+  const link = document.createElement("link");
+  link.rel = "shortcut icon";
+  link.type = "image/svg+xml";
+  link.href = url;
+  const head = document.querySelector("head");
+  if (head == null) {
+    console.error("head is null");
+    return;
+  }
+  const existingLink = document.querySelector('head link[rel="shortcut icon"]');
+  if (existingLink) {
+    head.removeChild(existingLink);
+  }
+  head.appendChild(link);
+}
+
+function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
   const config = useAppConfig();
   const location = useLocation();
   const isHome = location.pathname === Path.Home;
@@ -129,37 +167,53 @@ function Screen() {
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
+  const logoLoading = props.logoLoading;
+  const logoUrl = props.logoUrl || "";
+  useEffect(() => {
+    setFavicon(logoUrl, "");
+  }, [logoUrl]);
 
+  const separator = ([Path.Login] as string[]).includes(location.pathname);
   return (
-    <div
-      className={
-        styles.container +
-        ` ${
-          config.tightBorder && !isMobileScreen
-            ? styles["tight-container"]
-            : styles.container
-        } ${getLang() === "ar" ? styles["rtl-screen"] : ""}`
-      }
-    >
-      {isAuth ? (
-        <>
-          <AuthPage />
-        </>
-      ) : (
-        <>
-          <SideBar className={isHome ? styles["sidebar-show"] : ""} />
+    <div className={(separator ? "separator-page " : "") + "body"}>
+      <div
+        className={
+          styles.container +
+          ` ${
+            config.tightBorder && !isMobileScreen
+              ? styles["tight-container"]
+              : styles.container
+          } ${getLang() === "ar" ? styles["rtl-screen"] : ""}`
+        }
+      >
+        {isAuth ? (
+          <>
+            <AuthPage />
+          </>
+        ) : (
+          <>
+            {!separator && (
+              <SideBar className={isHome ? styles["sidebar-show"] : ""} />
+            )}
 
-          <div className={styles["window-content"]} id={SlotID.AppBody}>
-            <Routes>
-              <Route path={Path.Home} element={<Chat />} />
-              <Route path={Path.NewChat} element={<NewChat />} />
-              <Route path={Path.Masks} element={<MaskPage />} />
-              <Route path={Path.Chat} element={<Chat />} />
-              <Route path={Path.Settings} element={<Settings />} />
-            </Routes>
-          </div>
-        </>
-      )}
+            <div className={styles["window-content"]} id={SlotID.AppBody}>
+              <Routes>
+                <Route path={Path.Home} element={<Chat />} />
+                <Route path={Path.NewChat} element={<NewChat />} />
+                <Route path={Path.Masks} element={<MaskPage />} />
+                <Route path={Path.Chat} element={<Chat />} />
+                <Route path={Path.Settings} element={<Settings />} />
+                <Route
+                  path={Path.Login}
+                  element={
+                    <Login logoLoading={logoLoading} logoUrl={logoUrl} />
+                  }
+                />
+              </Routes>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -180,20 +234,21 @@ export function Home() {
   useSwitchTheme();
   useLoadData();
   useHtmlLang();
-
+  const [logoLoading, setLogoLoading] = useState(false);
+  const { logoUrl } = useWebsiteConfigStore();
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
     useAccessStore.getState().fetch();
   }, []);
 
   if (!useHasHydrated()) {
-    return <Loading />;
+    return <Loading noLogo logoLoading />;
   }
 
   return (
     <ErrorBoundary>
       <Router>
-        <Screen />
+        <Screen logoLoading={logoLoading} logoUrl={logoUrl} />
       </Router>
     </ErrorBoundary>
   );

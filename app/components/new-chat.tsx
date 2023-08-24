@@ -95,6 +95,7 @@ export function NewChat() {
 
   const startChat = (mask?: Mask) => {
     setTimeout(() => {
+      mask && console.log("[面具]", mask);
       chatStore.newSession(mask);
       navigate(Path.Chat);
     }, 10);

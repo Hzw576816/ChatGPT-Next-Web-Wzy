@@ -1,6 +1,6 @@
 import { getClientConfig } from "../config/client";
 import { ACCESS_CODE_PREFIX } from "../constant";
-import { ChatMessage, ModelType, useAccessStore } from "../store";
+import { ChatMessage, ModelType, useAccessStore, useAuthStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
 export const ROLES = ["system", "user", "assistant"] as const;
@@ -21,6 +21,7 @@ export interface LLMConfig {
   stream?: boolean;
   presence_penalty?: number;
   frequency_penalty?: number;
+  chatId: string;
 }
 
 export interface ChatOptions {
@@ -45,7 +46,9 @@ export interface LLMModel {
 
 export abstract class LLMApi {
   abstract chat(options: ChatOptions): Promise<void>;
+
   abstract usage(): Promise<LLMUsage>;
+
   abstract models(): Promise<LLMModel[]>;
 }
 
@@ -126,7 +129,7 @@ export class ClientApi {
 export const api = new ClientApi();
 
 export function getHeaders() {
-  const accessStore = useAccessStore.getState();
+  const authStore = useAuthStore.getState();
   let headers: Record<string, string> = {
     "Content-Type": "application/json",
     "x-requested-with": "XMLHttpRequest",
@@ -136,16 +139,17 @@ export function getHeaders() {
   const validString = (x: string) => x && x.length > 0;
 
   // use user's api key first
-  if (validString(accessStore.token)) {
-    headers.Authorization = makeBearer(accessStore.token);
-  } else if (
-    accessStore.enabledAccessControl() &&
-    validString(accessStore.accessCode)
-  ) {
-    headers.Authorization = makeBearer(
-      ACCESS_CODE_PREFIX + accessStore.accessCode,
-    );
+  if (validString(authStore.token)) {
+    headers.Authorization = makeBearer(authStore.token);
   }
+  // else if (
+  //   accessStore.enabledAccessControl() &&
+  //   validString(accessStore.accessCode)
+  // ) {
+  //   headers.Authorization = makeBearer(
+  //     ACCESS_CODE_PREFIX + accessStore.accessCode,
+  //   );
+  // }
 
   return headers;
 }

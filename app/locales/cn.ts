@@ -6,6 +6,10 @@ const isApp = !!getClientConfig()?.isApp;
 const cn = {
   WIP: "该功能仍在开发中……",
   Error: {
+    Unauthorized: "登录信息已过期或未登录，请前往[登录页](/#/login)登录后操作",
+    Login: "您已登录，请点击下方「重试」按钮",
+  },
+  Error_del: {
     Unauthorized: isApp
       ? "检测到无效 API Key，请前往[设置](/#/settings)页检查 API Key 是否配置正确。"
       : "访问密码不正确或为空，请前往[登录](/#/auth)页输入正确的访问密码，或者在[设置](/#/settings)页填入你自己的 OpenAI API Key。",
@@ -358,6 +362,34 @@ const cn = {
     Messages: "消息",
     Topic: "主题",
     Time: "时间",
+  },
+
+  LoginPage: {
+    Title: "登录",
+    SubTitle: "登录后可跟AI交流",
+    Username: {
+      Title: "用户名或邮箱",
+      SubTitle: "",
+      Placeholder: "请输入用户名或邮箱",
+    },
+    Password: {
+      Title: "密码",
+      SubTitle: "",
+      Placeholder: "请输入密码",
+    },
+    Actions: {
+      Close: "关闭",
+      Login: "登录",
+      Logout: "退出登录",
+    },
+    Toast: {
+      Success: "登录成功",
+      Logining: "登录中……",
+      EmptyUserName: "用户名不能为空",
+      EmptyPassword: "密码不能为空！",
+    },
+    GoToRegister: "前往注册",
+    ForgetPassword: "忘记/重置密码",
   },
 };
 

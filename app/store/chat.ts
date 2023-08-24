@@ -17,6 +17,7 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { estimateTokenLength } from "../utils/token";
 import { nanoid } from "nanoid";
+import { requestNewOrUpdateSession } from "../requests";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -86,7 +87,7 @@ interface ChatStore {
   clearSessions: () => void;
   moveSession: (from: number, to: number) => void;
   selectSession: (index: number) => void;
-  newSession: (mask?: Mask) => void;
+  newSession: (mask?: Mask) => Promise<void>;
   deleteSession: (index: number) => void;
   currentSession: () => ChatSession;
   nextSession: (delta: number) => void;
@@ -178,7 +179,7 @@ export const useChatStore = create<ChatStore>()(
         });
       },
 
-      newSession(mask) {
+      async newSession(mask) {
         const session = createEmptySession();
 
         if (mask) {
@@ -193,6 +194,12 @@ export const useChatStore = create<ChatStore>()(
             },
           };
           session.topic = mask.name;
+        }
+
+        let result: any = await requestNewOrUpdateSession(session.topic);
+        console.log("result", result);
+        if (result.code === 0) {
+          session.id = result.data;
         }
 
         set((state) => ({
@@ -276,6 +283,7 @@ export const useChatStore = create<ChatStore>()(
 
       async onUserInput(content) {
         const session = get().currentSession();
+
         const modelConfig = session.mask.modelConfig;
 
         const userContent = fillTemplateWith(content, modelConfig);
@@ -312,7 +320,7 @@ export const useChatStore = create<ChatStore>()(
         // make request
         api.llm.chat({
           messages: sendMessages,
-          config: { ...modelConfig, stream: true },
+          config: { ...modelConfig, stream: true, chatId: session.id },
           onUpdate(message) {
             botMessage.streaming = true;
             if (message) {
@@ -487,31 +495,33 @@ export const useChatStore = create<ChatStore>()(
 
         // should summarize topic after chating more than 50 words
         const SUMMARIZE_MIN_LEN = 50;
-        if (
-          config.enableAutoGenerateTitle &&
-          session.topic === DEFAULT_TOPIC &&
-          countMessages(messages) >= SUMMARIZE_MIN_LEN
-        ) {
-          const topicMessages = messages.concat(
-            createMessage({
-              role: "user",
-              content: Locale.Store.Prompt.Topic,
-            }),
-          );
-          api.llm.chat({
-            messages: topicMessages,
-            config: {
-              model: "gpt-3.5-turbo",
-            },
-            onFinish(message) {
-              get().updateCurrentSession(
-                (session) =>
-                  (session.topic =
-                    message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
-              );
-            },
-          });
-        }
+
+        // todo  这里注释 20230822 多请求一次是为了做啥的
+        // if (
+        //     config.enableAutoGenerateTitle &&
+        //     session.topic === DEFAULT_TOPIC &&
+        //     countMessages(messages) >= SUMMARIZE_MIN_LEN
+        // ) {
+        //   const topicMessages = messages.concat(
+        //       createMessage({
+        //         role: "user",
+        //         content: Locale.Store.Prompt.Topic,
+        //       }),
+        //   );
+        //   api.llm.chat({
+        //     messages: topicMessages,
+        //     config: {
+        //       model: "gpt-3.5-turbo",
+        //     },
+        //     onFinish(message) {
+        //       get().updateCurrentSession(
+        //           (session) =>
+        //               (session.topic =
+        //                   message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
+        //       );
+        //     },
+        //   });
+        // }
 
         const modelConfig = session.mask.modelConfig;
         const summarizeIndex = Math.max(

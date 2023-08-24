@@ -16,6 +16,7 @@ export enum Path {
   NewChat = "/new-chat",
   Masks = "/masks",
   Auth = "/auth",
+  Login = "/login",
 }
 
 export enum SlotID {
@@ -35,6 +36,8 @@ export enum StoreKey {
   Prompt = "prompt-store",
   Update = "chat-update",
   Sync = "sync",
+  Auth = "auth",
+  WebsiteConfig = "website-config",
 }
 
 export const MAX_SIDEBAR_WIDTH = 500;

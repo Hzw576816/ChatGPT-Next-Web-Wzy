@@ -70,6 +70,7 @@ export class ChatGPTApi implements LLMApi {
       presence_penalty: modelConfig.presence_penalty,
       frequency_penalty: modelConfig.frequency_penalty,
       top_p: modelConfig.top_p,
+      chatId: options.config.chatId,
     };
 
     console.log("[Request] openai payload: ", requestPayload);
@@ -92,7 +93,6 @@ export class ChatGPTApi implements LLMApi {
         () => controller.abort(),
         REQUEST_TIMEOUT_MS,
       );
-
       if (shouldStream) {
         let responseText = "";
         let finished = false;
@@ -106,7 +106,7 @@ export class ChatGPTApi implements LLMApi {
 
         controller.signal.onabort = finish;
 
-        fetchEventSource(chatPath, {
+        await fetchEventSource(chatPath, {
           ...chatPayload,
           async onopen(res) {
             clearTimeout(requestTimeoutId);
@@ -120,7 +120,6 @@ export class ChatGPTApi implements LLMApi {
               responseText = await res.clone().text();
               return finish();
             }
-
             if (
               !res.ok ||
               !res.headers
@@ -186,6 +185,7 @@ export class ChatGPTApi implements LLMApi {
       options.onError?.(e as Error);
     }
   }
+
   async usage() {
     const formatDate = (d: Date) =>
       `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}-${d
@@ -278,4 +278,5 @@ export class ChatGPTApi implements LLMApi {
     }));
   }
 }
+
 export { OpenaiPath };

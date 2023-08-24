@@ -8,6 +8,7 @@ export function IconButton(props: {
   onClick?: () => void;
   icon?: JSX.Element;
   type?: ButtonType;
+  style?: object;
   text?: string;
   bordered?: boolean;
   shadow?: boolean;
@@ -16,19 +17,21 @@ export function IconButton(props: {
   disabled?: boolean;
   tabIndex?: number;
   autoFocus?: boolean;
+  block?: boolean;
 }) {
   return (
     <button
       className={
         styles["icon-button"] +
         ` ${props.bordered && styles.border} ${props.shadow && styles.shadow} ${
-          props.className ?? ""
-        } clickable ${styles[props.type ?? ""]}`
+          props.block && styles.block
+        } ${props.className ?? ""} clickable ${styles[props.type ?? ""]}`
       }
       onClick={props.onClick}
       title={props.title}
       disabled={props.disabled}
       role="button"
+      style={props.style}
       tabIndex={props.tabIndex}
       autoFocus={props.autoFocus}
     >

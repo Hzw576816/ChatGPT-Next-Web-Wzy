@@ -29,6 +29,17 @@ const nextConfig = {
   output: mode,
   images: {
     unoptimized: mode === "export",
+    remotePatterns:[
+      {
+        protocol: 'https',
+        hostname: 'thirdwx.qlogo.cn',
+        port: '',
+        pathname: '/mmopen/**',
+      },
+    ],
+    domains: [
+      "thirdwx.qlogo.cn", //微信
+    ],
   },
   experimental: {
     forceSwcTransforms: true,

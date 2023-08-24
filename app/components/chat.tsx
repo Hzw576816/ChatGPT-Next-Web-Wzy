@@ -42,6 +42,7 @@ import {
   BOT_HELLO,
   createMessage,
   useAccessStore,
+  useAuthStore,
   Theme,
   useAppConfig,
   DEFAULT_TOPIC,
@@ -92,6 +93,8 @@ import { getClientConfig } from "../config/client";
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
 });
+
+const AvatarImg = dynamic(async () => (await import("./avatar-img")).AvatarImg);
 
 export function SessionConfigModel(props: { onClose: () => void }) {
   const chatStore = useChatStore();
@@ -415,6 +418,7 @@ export function ChatActions(props: {
 
   // switch themes
   const theme = config.theme;
+
   function nextTheme() {
     const themes = [Theme.Auto, Theme.Light, Theme.Dark];
     const themeIndex = themes.indexOf(theme);
@@ -862,13 +866,18 @@ function _Chat() {
     return session.mask.hideContext ? [] : session.mask.context.slice();
   }, [session.mask.context, session.mask.hideContext]);
   const accessStore = useAccessStore();
-
+  const authStore = useAuthStore();
+  const avatar = authStore.avatar;
   if (
     context.length === 0 &&
     session.messages.at(0)?.content !== BOT_HELLO.content
   ) {
     const copiedHello = Object.assign({}, BOT_HELLO);
-    if (!accessStore.isAuthorized()) {
+    // if (!accessStore.isAuthorized()) {
+    //     copiedHello.content = Locale.Error.Unauthorized;
+    // }
+    if (!authStore.token) {
+      navigate(Path.Login);
       copiedHello.content = Locale.Error.Unauthorized;
     }
     context.push(copiedHello);
@@ -915,6 +924,7 @@ function _Chat() {
   const [msgRenderIndex, _setMsgRenderIndex] = useState(
     Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
   );
+
   function setMsgRenderIndex(newIndex: number) {
     newIndex = Math.min(renderMessages.length - CHAT_PAGE_SIZE, newIndex);
     newIndex = Math.max(0, newIndex);
@@ -1010,9 +1020,25 @@ function _Chat() {
     },
   });
 
+  useEffect(() => {
+    if (!authStore.token) {
+      // navigate(Path.Login)
+      return;
+    }
+  }, []);
   // edit / insert message modal
   const [isEditingMessage, setIsEditingMessage] = useState(false);
 
+  //console.log('messages', messages)
+  const message = messages.length > 0 ? messages.at(messages.length - 1) : null;
+  if (message) {
+    if (message.content === Locale.Error.Unauthorized) {
+      if (authStore.token) {
+        console.log("change the last message");
+        message.content = Locale.Error.Login;
+      }
+    }
+  }
   return (
     <div className={styles.chat} key={session.id}>
       <div className="window-header" data-tauri-drag-region>
@@ -1134,7 +1160,12 @@ function _Chat() {
                         ></IconButton>
                       </div>
                       {isUser ? (
-                        <Avatar avatar={config.avatar} />
+                        // <Avatar avatar={config.avatar}/>
+                        avatar ? (
+                          <AvatarImg src={avatar} />
+                        ) : (
+                          <Avatar avatar={config.avatar} />
+                        )
                       ) : (
                         <MaskAvatar mask={session.mask} />
                       )}
