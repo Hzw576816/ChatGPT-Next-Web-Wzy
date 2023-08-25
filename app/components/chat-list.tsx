@@ -16,8 +16,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { MaskAvatar } from "./mask";
 import { Mask } from "../store/mask";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { showConfirm } from "./ui-lib";
+import { Loading } from "@/app/components/home";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -91,14 +92,22 @@ export function ChatItem(props: {
 }
 
 export function ChatList(props: { narrow?: boolean }) {
-  const [sessions, selectedIndex, selectSession, moveSession] = useChatStore(
-    (state) => [
+  const [sessions, selectedIndex, selectSession, moveSession, getOwnSession] =
+    useChatStore((state) => [
       state.sessions,
       state.currentSessionIndex,
       state.selectSession,
       state.moveSession,
-    ],
-  );
+      state.getOwnSession,
+    ]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getOwnSession().finally(() => {
+      setIsLoading(false);
+    });
+  }, []);
+  //
   const chatStore = useChatStore();
   const navigate = useNavigate();
 
@@ -119,43 +128,53 @@ export function ChatList(props: { narrow?: boolean }) {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="chat-list">
-        {(provided) => (
-          <div
-            className={styles["chat-list"]}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {sessions.map((item, i) => (
-              <ChatItem
-                title={item.topic}
-                time={new Date(item.lastUpdate).toLocaleString()}
-                count={item.messages.length}
-                key={item.id}
-                id={item.id}
-                index={i}
-                selected={i === selectedIndex}
-                onClick={() => {
-                  navigate(Path.Chat);
-                  selectSession(i);
-                }}
-                onDelete={async () => {
-                  if (
-                    !props.narrow ||
-                    (await showConfirm(Locale.Home.DeleteChat))
-                  ) {
-                    chatStore.deleteSession(i);
-                  }
-                }}
-                narrow={props.narrow}
-                mask={item.mask}
-              />
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <>
+      {isLoading ? (
+        <>
+          <Loading noLogo logoLoading />
+        </>
+      ) : (
+        <>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="chat-list">
+              {(provided) => (
+                <div
+                  className={styles["chat-list"]}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {sessions.map((item, i) => (
+                    <ChatItem
+                      title={item.topic}
+                      time={item.lastUpdate}
+                      count={item.messages.length}
+                      key={item.id}
+                      id={item.id}
+                      index={i}
+                      selected={i === selectedIndex}
+                      onClick={() => {
+                        navigate(Path.Chat);
+                        selectSession(i);
+                      }}
+                      onDelete={async () => {
+                        if (
+                          !props.narrow ||
+                          (await showConfirm(Locale.Home.DeleteChat))
+                        ) {
+                          chatStore.deleteSession(i);
+                        }
+                      }}
+                      narrow={props.narrow}
+                      mask={item.mask}
+                    />
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </>
+      )}
+    </>
   );
 }

@@ -112,11 +112,11 @@ export async function request(req: NextRequest) {
   }, 10 * 60 * 1000);
 
   try {
-    console.log(`url = ${baseUrl}/${uri}`);
     const res = await fetch(`${baseUrl}/${uri}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: authValue,
+        "accept-language": "zh-Hans",
       },
       cache: "no-store",
       method: req.method,
@@ -125,7 +125,6 @@ export async function request(req: NextRequest) {
       duplex: "half",
       signal: controller.signal,
     });
-
     // to prevent browser prompt for credentials
     const newHeaders = new Headers(res.headers);
     newHeaders.delete("www-authenticate");

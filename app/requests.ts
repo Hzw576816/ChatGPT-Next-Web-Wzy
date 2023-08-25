@@ -1,5 +1,7 @@
 import type { Response } from "./api/common";
 import { getHeaders } from "@/app/client/api";
+import { Mask } from "@/app/store/mask";
+import { useAuthStore } from "@/app/store";
 
 export interface CallResult {
   code: number;
@@ -30,10 +32,15 @@ export async function request(
       // // @ts-ignore
       // duplex: "half",
     });
+    if (res.status === 401) {
+      return {
+        code: 401,
+        message: "",
+      };
+    }
     let response = await res.json();
-
-    let json: Response<any>;
     if (res.status == 200) {
+      let json: Response<any>;
       json = response as Response<any>;
       return {
         code: 0,
@@ -83,11 +90,51 @@ export async function requestLogin(
  * 创建修改聊天会话
  * @param name
  * @param id
- * @param options
+ * @param mask
  */
 export async function requestNewOrUpdateSession(
   name: string,
+  mask: Mask,
   id?: string,
 ): Promise<CallResult> {
-  return request("/app/v1/chat/create-chat-session", "POST", { id, name });
+  return request("/app/v1/chat/create-chat-session", "POST", {
+    id,
+    topic: name,
+    mask,
+  });
+}
+
+/**
+ * 获取聊天会话
+ */
+export async function requestGetOwnSession(): Promise<CallResult> {
+  return request("/app/v1/chat/list-session", "POST", {});
+}
+
+/**
+ * 获取会话消息记录
+ * @param chatId
+ */
+export async function requestGetMessages(chatId: string): Promise<CallResult> {
+  return request("/app/v1/chat/list-session-chat", "POST", { chatId });
+}
+
+/**
+ * 移除会话
+ * @param sessionId
+ */
+export async function requestRemoveSession(
+  sessionId: string,
+): Promise<CallResult> {
+  return request("/app/v1/chat/remove-session", "POST", { id: sessionId });
+}
+
+/**
+ * 撤销会话
+ * @param sessionId
+ */
+export async function requestRevokeSession(
+  sessionId: string,
+): Promise<CallResult> {
+  return request("/app/v1/chat/revoke-session", "POST", { id: sessionId });
 }

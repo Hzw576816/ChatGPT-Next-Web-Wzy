@@ -8,6 +8,7 @@ const cn = {
   Error: {
     Unauthorized: "登录信息已过期或未登录，请前往[登录页](/#/login)登录后操作",
     Login: "您已登录，请点击下方「重试」按钮",
+    Exception: "请求异常，请点击下方「重试」按钮",
   },
   Error_del: {
     Unauthorized: isApp

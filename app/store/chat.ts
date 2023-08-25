@@ -17,7 +17,14 @@ import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { estimateTokenLength } from "../utils/token";
 import { nanoid } from "nanoid";
-import { requestNewOrUpdateSession } from "../requests";
+import {
+  CallResult,
+  requestGetMessages,
+  requestGetOwnSession,
+  requestNewOrUpdateSession,
+  requestRemoveSession,
+  requestRevokeSession,
+} from "../requests";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -50,7 +57,7 @@ export interface ChatSession {
   memoryPrompt: string;
   messages: ChatMessage[];
   stat: ChatStat;
-  lastUpdate: number;
+  lastUpdate: string;
   lastSummarizeIndex: number;
   clearContextIndex?: number;
 
@@ -74,7 +81,7 @@ function createEmptySession(): ChatSession {
       wordCount: 0,
       charCount: 0,
     },
-    lastUpdate: Date.now(),
+    lastUpdate: new Date().toLocaleString(),
     lastSummarizeIndex: 0,
 
     mask: createEmptyMask(),
@@ -83,7 +90,11 @@ function createEmptySession(): ChatSession {
 
 interface ChatStore {
   sessions: ChatSession[];
+  chatLoading: boolean;
   currentSessionIndex: number;
+  unauthorized: (result: CallResult) => void;
+  getOwnSession: () => Promise<void>;
+  getMessages: () => Promise<void>;
   clearSessions: () => void;
   moveSession: (from: number, to: number) => void;
   selectSession: (index: number) => void;
@@ -138,9 +149,51 @@ function fillTemplateWith(input: string, modelConfig: ModelConfig) {
 export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
+      chatLoading: true,
+      unauthorized(result: CallResult) {
+        if (result.code === 401) {
+          set((state) => ({
+            currentSessionIndex: 0,
+            chatLoading: false,
+          }));
+        }
+      },
       sessions: [createEmptySession()],
       currentSessionIndex: 0,
+      async getOwnSession() {
+        set((state) => ({
+          chatLoading: true,
+        }));
+        let result: CallResult = await requestGetOwnSession();
+        if (result.code === 0) {
+          if (result.data.length > 0) {
+            set((state) => ({
+              currentSessionIndex: 0,
+              chatLoading: false,
+              sessions: result.data as ChatSession[],
+            }));
+          } else {
+            await get().newSession();
+            await get().getOwnSession();
+          }
+        }
 
+        get().unauthorized(result);
+      },
+      async getMessages() {
+        const currentSession = get().currentSession();
+        let result: CallResult = await requestGetMessages(currentSession.id);
+        if (result.code === 0) {
+          get().updateCurrentSession((session) => {
+            session.messages = result.data.items;
+          });
+
+          set((state) => ({
+            chatLoading: false,
+          }));
+        }
+        get().unauthorized(result);
+      },
       clearSessions() {
         set(() => ({
           sessions: [createEmptySession()],
@@ -151,7 +204,11 @@ export const useChatStore = create<ChatStore>()(
       selectSession(index: number) {
         set({
           currentSessionIndex: index,
+          chatLoading: true,
         });
+        get()
+          .getMessages()
+          .finally(() => {});
       },
 
       moveSession(from: number, to: number) {
@@ -195,13 +252,13 @@ export const useChatStore = create<ChatStore>()(
           };
           session.topic = mask.name;
         }
-
-        let result: any = await requestNewOrUpdateSession(session.topic);
-        console.log("result", result);
+        let result: any = await requestNewOrUpdateSession(
+          session.topic,
+          session.mask,
+        );
         if (result.code === 0) {
           session.id = result.data;
         }
-
         set((state) => ({
           currentSessionIndex: 0,
           sessions: [session].concat(state.sessions),
@@ -215,43 +272,61 @@ export const useChatStore = create<ChatStore>()(
         get().selectSession(limit(i + delta));
       },
 
-      deleteSession(index) {
+      async deleteSession(index) {
         const deletingLastSession = get().sessions.length === 1;
         const deletedSession = get().sessions.at(index);
 
         if (!deletedSession) return;
 
-        const sessions = get().sessions.slice();
-        sessions.splice(index, 1);
+        set(() => ({
+          chatLoading: true,
+        }));
 
-        const currentIndex = get().currentSessionIndex;
-        let nextIndex = Math.min(
-          currentIndex - Number(index < currentIndex),
-          sessions.length - 1,
-        );
-
+        await requestRemoveSession(deletedSession.id);
+        //如果是最后一个被移除后,就需要重新建一个
         if (deletingLastSession) {
-          nextIndex = 0;
-          sessions.push(createEmptySession());
+          await get().newSession();
         }
 
-        // for undo delete action
+        // const sessions = get().sessions.slice();
+        // sessions.splice(index, 1);
+        //
+        // const currentIndex = get().currentSessionIndex;
+        // let nextIndex = Math.min(
+        //     currentIndex - Number(index < currentIndex),
+        //     sessions.length - 1,
+        // );
+        //
+        // if (deletingLastSession) {
+        //     nextIndex = 0;
+        //     set(() => ({
+        //         chatLoading: true,
+        //     }));
+        //     await get().newSession();
+        //     // sessions.push(createEmptySession());
+        // }
+
+        // for undo delete action 撤销
         const restoreState = {
           currentSessionIndex: get().currentSessionIndex,
           sessions: get().sessions.slice(),
         };
 
-        set(() => ({
-          currentSessionIndex: nextIndex,
-          sessions,
-        }));
+        // set(() => ({
+        //     currentSessionIndex: nextIndex,
+        //     sessions,
+        // }));
+
+        await get().getOwnSession();
 
         showToast(
           Locale.Home.DeleteToast,
           {
             text: Locale.Home.Revert,
             onClick() {
-              set(() => restoreState);
+              requestRevokeSession(deletedSession.id).finally(() => {
+                get().getOwnSession();
+              });
             },
           },
           5000,
@@ -268,14 +343,13 @@ export const useChatStore = create<ChatStore>()(
         }
 
         const session = sessions[index];
-
         return session;
       },
 
       onNewMessage(message) {
         get().updateCurrentSession((session) => {
           session.messages = session.messages.concat();
-          session.lastUpdate = Date.now();
+          session.lastUpdate = new Date().toLocaleString();
         });
         get().updateStat(message);
         get().summarizeSession();
@@ -316,8 +390,8 @@ export const useChatStore = create<ChatStore>()(
             botMessage,
           ]);
         });
-
         // make request
+        //这里不能加await 会导致loading异常 2023.0825
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true, chatId: session.id },
@@ -565,7 +639,12 @@ export const useChatStore = create<ChatStore>()(
                 date: "",
               }),
             ),
-            config: { ...modelConfig, stream: true, model: "gpt-3.5-turbo" },
+            config: {
+              ...modelConfig,
+              stream: true,
+              model: "gpt-3.5-turbo",
+              chatId: session.id,
+            },
             onUpdate(message) {
               session.memoryPrompt = message;
             },
@@ -605,7 +684,6 @@ export const useChatStore = create<ChatStore>()(
       migrate(persistedState, version) {
         const state = persistedState as any;
         const newState = JSON.parse(JSON.stringify(state)) as ChatStore;
-
         if (version < 2) {
           newState.sessions = [];
 

@@ -89,6 +89,7 @@ import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
+import { Loading } from "@/app/components/home";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -784,6 +785,7 @@ function _Chat() {
     }
   };
 
+  // todo 删除消息...
   const deleteMessage = (msgId?: string) => {
     chatStore.updateCurrentSession(
       (session) =>
@@ -945,7 +947,8 @@ function _Chat() {
 
     const isTouchTopEdge = e.scrollTop <= edgeThreshold;
     const isTouchBottomEdge = bottomHeight >= e.scrollHeight - edgeThreshold;
-    const isHitBottom = bottomHeight >= e.scrollHeight - 10;
+    const isHitBottom =
+      bottomHeight >= e.scrollHeight - (isMobileScreen ? 0 : 10);
 
     const prevPageMsgIndex = msgRenderIndex - CHAT_PAGE_SIZE;
     const nextPageMsgIndex = msgRenderIndex + CHAT_PAGE_SIZE;
@@ -1119,6 +1122,7 @@ function _Chat() {
         }}
       >
         {messages.map((message, i) => {
+          // console.log("messages.length",messages.length)
           const isUser = message.role === "user";
           const isContext = i < context.length;
           const showActions =
@@ -1310,5 +1314,18 @@ function _Chat() {
 export function Chat() {
   const chatStore = useChatStore();
   const sessionIndex = chatStore.currentSessionIndex;
-  return <_Chat key={sessionIndex}></_Chat>;
+  const chatLoading = chatStore.chatLoading;
+  return (
+    <>
+      {chatLoading ? (
+        <>
+          <Loading noLogo logoLoading />
+        </>
+      ) : (
+        <>
+          <_Chat key={sessionIndex}></_Chat>
+        </>
+      )}
+    </>
+  );
 }

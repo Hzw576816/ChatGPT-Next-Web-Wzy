@@ -5,10 +5,11 @@ import { requestLogin } from "../requests";
 
 export interface AuthStore {
   token: string;
-  userName: string;
+  username: string;
   // inviteCode: string,//邀请码
   avatar: string; //头像
   user: any;
+  clean: () => void;
   login: (username: string, password: string) => Promise<any>;
   // logout: () => void;
 }
@@ -18,7 +19,7 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       name: "",
       token: "",
-      userName: "",
+      username: "",
       avatar: "",
       user: null,
       async login(username: string, password: string) {
@@ -38,6 +39,15 @@ export const useAuthStore = create<AuthStore>()(
         }
 
         return result;
+      },
+      clean() {
+        set(() => ({
+          name: "",
+          token: "",
+          username: "",
+          avatar: "",
+          user: null,
+        }));
       },
     }),
     {

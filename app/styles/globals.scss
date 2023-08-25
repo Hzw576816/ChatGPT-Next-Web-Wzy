@@ -109,13 +109,20 @@ body {
   margin: 0;
   padding: 0;
   height: var(--full-height);
+  position: relative;
+
+}
+
+.body {
+  margin: 0;
+  padding: 0;
+  height: var(--full-height);
   width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
   user-select: none;
   touch-action: pan-x pan-y;
-  overflow: hidden;
 
   @media only screen and (max-width: 600px) {
     background-color: var(--second);
