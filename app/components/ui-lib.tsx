@@ -655,9 +655,7 @@ export function BalanceListItem(props: {
         <div className={styles["header"]}>
           <div className={styles["title"]}>{props.title}</div>
           <div className={styles["right"]}>
-            <div className={styles["price"]} style={{ fontSize: "18px" }}>
-              到期时间: {props.endTime}
-            </div>
+            <div className={styles["r-title"]}>到期时间: {props.endTime}</div>
             <div className={styles["sub-title"]}>
               购买时间: {props.createTime}
             </div>

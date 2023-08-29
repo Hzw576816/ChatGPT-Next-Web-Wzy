@@ -34,7 +34,8 @@ import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 import RobotIcon from "../icons/robot.svg";
-
+import UserIcon from "../icons/user.svg";
+import CartIcon from "../icons/cart-outline.svg";
 import {
   ChatMessage,
   SubmitKey,
@@ -1079,6 +1080,20 @@ function _Chat() {
               />
             </div>
           )}
+          <div className="window-action-button">
+            <IconButton
+              icon={<CartIcon />}
+              bordered
+              onClick={() => navigate(Path.Pricing)}
+            />
+          </div>
+          <div className="window-action-button">
+            <IconButton
+              icon={<UserIcon />}
+              bordered
+              onClick={() => navigate(Path.Profile)}
+            />
+          </div>
           <div className="window-action-button">
             <IconButton
               icon={<ExportIcon />}

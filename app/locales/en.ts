@@ -11,6 +11,153 @@ const en: LocaleType = {
     Unauthorized: isApp
       ? "Invalid API Key, please check it in [Settings](/#/settings) page."
       : "Unauthorized access, please enter access code in [auth](/#/auth) page, or enter your OpenAI API Key.",
+    Login: "您已登录，请点击下方「重试」按钮",
+    Exception: "请求异常，请点击下方「重试」按钮",
+  },
+  PricingPage: {
+    Title: "购买套餐",
+    SubTitle: "畅享与AI聊天的乐趣",
+    Actions: {
+      Close: "关闭",
+      Buy: " 购 买 ",
+      Order: "订单中心",
+      RedeemCode: "兑换码",
+    },
+    NoPackage: "暂无可用套餐",
+    Loading: "请稍候……",
+    PleaseLogin: "请先登录",
+    ConsultAdministrator: "请咨询站长",
+    BuyFailedCause: "套餐购买失败！原因：",
+    TOO_FREQUENCILY: "操作过于频繁，请稍后再试",
+    CREATE_ORDER_FAILED: "创建订单失败",
+  },
+  PayPage: {
+    PaidSuccess: "支付成功",
+    Actions: {
+      Close: "关闭",
+    },
+  },
+  BalancePage: {
+    Title: "已购套餐",
+    NoBalance: "您尚未购买任何套餐",
+    Loading: "请稍候……",
+    Actions: {
+      Close: "关闭",
+      Pricing: "购买套餐",
+      Order: "订单中心",
+      Profile: "个人中心",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+      RedeemCode: "兑换码",
+    },
+  },
+  OrderPage: {
+    Title: "订单中心",
+    NoOrder: "暂无订单",
+    Loading: "请稍候……",
+    StateError: "状态错误！",
+    CancelFailedForStateError: "当前状态下无法取消",
+    CancelSuccess: "订单取消成功",
+    CancelFailure: "订单取消失败",
+    TryAgainLaster: "操作失败，请稍候重试",
+    PleaseWaitForDataSync:
+      "数据可能延迟，支付成功请在10分钟后查看订单状态，请勿重复支付",
+    Actions: {
+      Pay: "支付",
+      Cancel: "取消",
+      Pricing: "购买套餐",
+      Profile: "个人中心",
+      Copy: "复制",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+    },
+  },
+  Profile: {
+    Title: "个人中心",
+    SubTitle: "个人中心",
+    AccountName: "账号",
+    Username: "微信名",
+    Email: "邮箱",
+    Phone: "手机号",
+    RegisterTime: "注册时间",
+    InviteCode: {
+      Title: "邀请码(选填)",
+      TitleRequired: "邀请码(必填)",
+      Placeholder: "输入邀请码获得额外权益",
+    },
+    Tokens: {
+      Title: "tokens",
+      SubTitle: "tokens数量",
+    },
+    ChatCount: {
+      Title: "询问次数",
+      SubTitle: "询问次数（GPT3.5等）",
+    },
+    AdvanceChatCount: {
+      Title: "询问次数（GPT4）",
+      SubTitle: "询问次数（GPT4）",
+    },
+    DrawCount: {
+      Title: "绘图次数",
+      SubTitle: "绘图次数",
+    },
+    Actions: {
+      Close: "关闭",
+      Pricing: "购买套餐",
+      Order: "订单中心",
+      GoToBalanceList: "更多",
+      ConsultAdministrator: "请咨询站长",
+      All: "所有套餐",
+      CreateInviteCode: "生成邀请码",
+      Copy: "复制链接",
+      Redeem: "兑换码",
+    },
+    BalanceItem: {
+      Title: "套餐类型",
+      SubTitle: "",
+      CalcTypes: {
+        Total: "总额",
+        Daily: "每天",
+        Hourly: "每小时",
+        ThreeHourly: "每3小时",
+      },
+    },
+    ExpireList: {
+      Title: "到期时间",
+      SubTitle: "",
+    },
+  },
+  LoginPage: {
+    Title: "登录",
+    SubTitle: "登录后可跟AI交流",
+    Username: {
+      Title: "用户名或邮箱",
+      SubTitle: "",
+      Placeholder: "请输入用户名或邮箱",
+    },
+    Password: {
+      Title: "密码",
+      SubTitle: "",
+      Placeholder: "请输入密码",
+    },
+    Actions: {
+      Close: "关闭",
+      Login: "登录",
+      Logout: "退出登录",
+    },
+    Toast: {
+      Success: "登录成功",
+      Logining: "登录中……",
+      EmptyUserName: "用户名不能为空",
+      EmptyPassword: "密码不能为空！",
+    },
+    GoToRegister: "前往注册",
+    ForgetPassword: "忘记/重置密码",
+  },
+  Error_del: {
+    Unauthorized: isApp
+      ? "检测到无效 API Key，请前往[设置](/#/settings)页检查 API Key 是否配置正确。"
+      : "访问密码不正确或为空，请前往[登录](/#/auth)页输入正确的访问密码，或者在[设置](/#/settings)页填入你自己的 OpenAI API Key。",
   },
   Auth: {
     Title: "Need Access Code",

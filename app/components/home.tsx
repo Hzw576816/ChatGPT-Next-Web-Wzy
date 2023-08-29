@@ -92,6 +92,10 @@ const Balance = dynamic(async () => (await import("./balance")).Balance, {
   loading: () => <Loading noLogo logoLoading />,
 });
 
+const Profile = dynamic(async () => (await import("./profile")).Profile, {
+  loading: () => <Loading noLogo logoLoading />,
+});
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -229,6 +233,7 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
                 <Route path={Path.Pay} element={<Pay />} />
                 <Route path={Path.Order} element={<Order />} />
                 <Route path={Path.Balance} element={<Balance />} />
+                <Route path={Path.Profile} element={<Profile />} />
               </Routes>
             </div>
           </>

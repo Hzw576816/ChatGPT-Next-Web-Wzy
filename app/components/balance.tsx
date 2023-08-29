@@ -33,7 +33,7 @@ interface Balance {
   attrs: any[];
 }
 
-export function Balance() {
+export function Balance(props: { isProfile?: boolean }) {
   const navigate = useNavigate();
   const [balanceList, setBalanceList] = useState<Balance[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -68,27 +68,32 @@ export function Balance() {
 
   return (
     <ErrorBoundary>
-      <div className="window-header" data-tauri-drag-region>
-        <div className="window-header-title">
-          <div className="window-header-main-title">
-            {Locale.BalancePage.Title}
+      {!props.isProfile && (
+        <div className="window-header" data-tauri-drag-region>
+          <div className="window-header-title">
+            <div className="window-header-main-title">
+              {Locale.BalancePage.Title}
+            </div>
+            <div className="window-header-sub-title">
+              {/* {Locale.Profile.SubTitle} */}
+            </div>
           </div>
-          <div className="window-header-sub-title">
-            {/* {Locale.Profile.SubTitle} */}
+          <div className="window-actions">
+            <div className="window-action-button">
+              <IconButton
+                icon={<CloseIcon />}
+                onClick={() => navigate(Path.Home)}
+                bordered
+                title={Locale.BalancePage.Actions.Close}
+              />
+            </div>
           </div>
         </div>
-        <div className="window-actions">
-          <div className="window-action-button">
-            <IconButton
-              icon={<CloseIcon />}
-              onClick={() => navigate(Path.Home)}
-              bordered
-              title={Locale.BalancePage.Actions.Close}
-            />
-          </div>
-        </div>
-      </div>
-      <div className={styles["balance"]}>
+      )}
+      <div
+        className={styles["balance"]}
+        style={{ padding: props.isProfile ? "0" : "20px" }}
+      >
         {balanceList.length === 0 ? (
           <List>
             <div
@@ -128,38 +133,40 @@ export function Balance() {
               ></BalanceListItem>
             );
           })}
-        <List>
-          <ListItem>
-            <IconButton
-              text={Locale.BalancePage.Actions.Pricing}
-              block={true}
-              type="primary"
-              onClick={() => {
-                navigate(Path.Pricing);
-              }}
-            />
-          </ListItem>
-          <ListItem>
-            <IconButton
-              text={Locale.BalancePage.Actions.Profile}
-              block={true}
-              type="second"
-              onClick={() => {
-                navigate(Path.Profile);
-              }}
-            />
-          </ListItem>
-          <ListItem>
-            <IconButton
-              text={Locale.BalancePage.Actions.Order}
-              block={true}
-              type="second"
-              onClick={() => {
-                navigate(Path.Order);
-              }}
-            />
-          </ListItem>
-        </List>
+        {!props.isProfile && (
+          <List>
+            <ListItem>
+              <IconButton
+                text={Locale.BalancePage.Actions.Pricing}
+                block={true}
+                type="primary"
+                onClick={() => {
+                  navigate(Path.Pricing);
+                }}
+              />
+            </ListItem>
+            <ListItem>
+              <IconButton
+                text={Locale.BalancePage.Actions.Profile}
+                block={true}
+                type="second"
+                onClick={() => {
+                  navigate(Path.Profile);
+                }}
+              />
+            </ListItem>
+            <ListItem>
+              <IconButton
+                text={Locale.BalancePage.Actions.Order}
+                block={true}
+                type="second"
+                onClick={() => {
+                  navigate(Path.Order);
+                }}
+              />
+            </ListItem>
+          </List>
+        )}
       </div>
     </ErrorBoundary>
   );

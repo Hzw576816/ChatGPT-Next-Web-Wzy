@@ -71,9 +71,11 @@ const cn = {
   Profile: {
     Title: "个人中心",
     SubTitle: "个人中心",
-    Username: "账号",
+    AccountName: "账号",
+    Username: "微信名",
     Email: "邮箱",
     Phone: "手机号",
+    RegisterTime: "注册时间",
     InviteCode: {
       Title: "邀请码(选填)",
       TitleRequired: "邀请码(必填)",
