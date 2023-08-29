@@ -17,6 +17,9 @@ export enum Path {
   Masks = "/masks",
   Auth = "/auth",
   Login = "/login",
+  Pricing = "/pricing",
+  Order = "/order",
+  Pay = "/pay",
 }
 
 export enum SlotID {

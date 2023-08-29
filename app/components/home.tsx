@@ -76,6 +76,14 @@ const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
   loading: () => <Loading noLogo logoLoading />,
 });
 
+const Pricing = dynamic(async () => (await import("./pricing")).Pricing, {
+  loading: () => <Loading noLogo logoLoading />,
+});
+
+const Pay = dynamic(async () => (await import("./pay-pc")).PayPc, {
+  loading: () => <Loading noLogo logoLoading />,
+});
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -209,6 +217,8 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
                     <Login logoLoading={logoLoading} logoUrl={logoUrl} />
                   }
                 />
+                <Route path={Path.Pricing} element={<Pricing />} />
+                <Route path={Path.Pay} element={<Pay />} />
               </Routes>
             </div>
           </>

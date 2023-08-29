@@ -71,6 +71,9 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
       });
   }
 
+  function logout() {
+    authStore.logout();
+  }
   return (
     <ErrorBoundary>
       <div className="window-header" data-tauri-drag-region>
@@ -134,7 +137,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
             subTitle={Locale.LoginPage.Username.SubTitle}
           >
             {authStore.token ? (
-              <span>{authStore.userName}</span>
+              <span>{authStore.username}</span>
             ) : (
               <SingleInput
                 value={username}
@@ -174,7 +177,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
               block={true}
               onClick={() => {
                 if (authStore.token) {
-                  // logout();
+                  logout();
                 } else {
                   login();
                 }

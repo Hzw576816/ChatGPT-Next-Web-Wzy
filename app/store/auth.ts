@@ -11,7 +11,7 @@ export interface AuthStore {
   user: any;
   clean: () => void;
   login: (username: string, password: string) => Promise<any>;
-  // logout: () => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -39,6 +39,9 @@ export const useAuthStore = create<AuthStore>()(
         }
 
         return result;
+      },
+      logout() {
+        get().clean();
       },
       clean() {
         set(() => ({

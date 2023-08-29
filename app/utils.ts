@@ -97,6 +97,7 @@ export function useWindowSize() {
 }
 
 export const MOBILE_MAX_WIDTH = 600;
+
 export function useMobileScreen() {
   const { width } = useWindowSize();
 

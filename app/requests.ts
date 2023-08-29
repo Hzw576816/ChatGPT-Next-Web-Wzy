@@ -1,7 +1,6 @@
 import type { Response } from "./api/common";
 import { getHeaders } from "@/app/client/api";
 import { Mask } from "@/app/store/mask";
-import { useAuthStore } from "@/app/store";
 
 export interface CallResult {
   code: number;
@@ -38,7 +37,16 @@ export async function request(
         message: "",
       };
     }
-    let response = await res.json();
+    // res.text().then(ee=>{
+    //     console.log(ee,res)
+    // })
+    let resText = await res.text();
+    let response: any;
+    try {
+      response = JSON.parse(resText);
+    } catch (e) {
+      response = resText;
+    }
     if (res.status == 200) {
       let json: Response<any>;
       json = response as Response<any>;
@@ -57,6 +65,7 @@ export async function request(
       };
     }
   } catch (err) {
+    console.log(err);
     options?.onError(err as Error);
     return {
       code: -1,
@@ -137,4 +146,46 @@ export async function requestRevokeSession(
   sessionId: string,
 ): Promise<CallResult> {
   return request("/app/v1/chat/revoke-session", "POST", { id: sessionId });
+}
+
+/**
+ * 获取套餐
+ */
+export async function requestComboList(): Promise<CallResult> {
+  return request("/app/user/list-memberShipType-visible", "POST", {});
+}
+
+/**
+ * 购买套餐
+ */
+export async function requestPayComboApi(
+  memberTypeId: string,
+  reChargeId: string,
+  tradeType: "JSAPI" | "NATIVE" | "APP" | "MWEB",
+): Promise<CallResult> {
+  return request("/app/user/pay-member", "POST", {
+    memberTypeId,
+    reChargeId,
+    tradeType,
+  });
+}
+
+/**
+ * 根据订单号获取订单信息
+ * @param orderNo
+ */
+export async function requestGetPayOrderApi(
+  orderNo: string | null,
+): Promise<CallResult> {
+  return request(`/app/orders/get-order?orderNo=${orderNo}`, "POST", {});
+}
+
+/**
+ * 检查支付状态
+ * @param orderNo
+ */
+export async function requestCheckPayOrderPaidApi(
+  orderNo: string | null,
+): Promise<CallResult> {
+  return request(`/app/orders/check-pay-status?orderNo=${orderNo}`, "POST", {});
 }

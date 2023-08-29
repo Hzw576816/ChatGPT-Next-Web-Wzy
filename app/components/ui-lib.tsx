@@ -9,12 +9,15 @@ import ConfirmIcon from "../icons/confirm.svg";
 import CancelIcon from "../icons/cancel.svg";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
+import PinIcon from "../icons/pin.svg";
 
 import Locale from "../locales";
 
 import { createRoot } from "react-dom/client";
 import React, { HTMLProps, useEffect, useState } from "react";
 import { IconButton } from "./button";
+import { copyToClipboard } from "../utils";
+import GithubIcon from "@/app/icons/github.svg";
 
 export function Popover(props: {
   children: JSX.Element;
@@ -103,6 +106,7 @@ interface ModalProps {
   defaultMax?: boolean;
   onClose?: () => void;
 }
+
 export function Modal(props: ModalProps) {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -284,6 +288,7 @@ export function SingleInput(props: React.HTMLProps<HTMLInputElement>) {
     />
   );
 }
+
 export function Select(
   props: React.DetailedHTMLProps<
     React.SelectHTMLAttributes<HTMLSelectElement>,
@@ -491,6 +496,95 @@ export function Selector<T>(props: {
           })}
         </List>
       </div>
+    </div>
+  );
+}
+
+export function DangerousListItem(props: {
+  title?: string;
+  subTitle?: string;
+  children?: JSX.Element | JSX.Element[];
+  icon?: JSX.Element;
+  className?: string;
+  titleCopy?: boolean;
+}) {
+  return (
+    <div className={styles["list-item"] + ` ${props.className}`}>
+      <div className={styles["list-header"]}>
+        {props.icon && <div className={styles["list-icon"]}>{props.icon}</div>}
+        <div className={styles["list-item-title"]}>
+          {props.titleCopy && (
+            <div
+              dangerouslySetInnerHTML={{ __html: props.title || "" }}
+              onClick={() => {
+                copyToClipboard(props.title!);
+              }}
+            ></div>
+          )}
+          {!props.titleCopy && (
+            <div dangerouslySetInnerHTML={{ __html: props.title || "" }}></div>
+          )}
+          {props.subTitle && (
+            <div
+              className={styles["list-item-sub-title"]}
+              dangerouslySetInnerHTML={{ __html: props.subTitle }}
+            ></div>
+          )}
+        </div>
+      </div>
+      {props.children}
+    </div>
+  );
+}
+
+export function ComboListItem(props: {
+  id?: string;
+  title?: string;
+  price?: string;
+  allowReChargeCount: number;
+  discountedPrice?: string;
+  attrs: any[];
+  children?: JSX.Element | JSX.Element[];
+}) {
+  return (
+    <div className={styles["price-combo-card"]}>
+      <div className={styles["container"]}>
+        <div className={styles["header"]}>
+          <div className={styles["title"]}>{props.title}</div>
+          <div className={styles["right"]}>
+            <div className={styles["price"]}>
+              ￥ {props.discountedPrice}
+              <span className={styles["origin-price"]}>￥ {props.price}</span>
+            </div>
+            <div className={styles["action"]}>{props.children}</div>
+          </div>
+        </div>
+        <div className={styles["body"]}>
+          {props.attrs.map((item, index) => {
+            return (
+              <div
+                className={styles["item"]}
+                key={item.label + index + props.id}
+              >
+                <div className={styles["icon"]}>
+                  <IconButton
+                    style={{ background: "none", padding: "10px 0" }}
+                    icon={<PinIcon />}
+                  />
+                </div>
+                <div className={styles["label"]}>{item.label}</div>
+                <div className={styles["value"]}>{item.value}</div>
+                <div className={styles["unit"]}>{item.unit}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {props.allowReChargeCount === 1 ? (
+        <div className={styles["charge-privilege"]}>首次购买优惠</div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
