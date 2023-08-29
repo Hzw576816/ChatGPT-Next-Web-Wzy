@@ -2,7 +2,6 @@ import webpack from "webpack";
 
 const mode = process.env.BUILD_MODE ?? "standalone";
 console.log("[Next] build mode", mode);
-
 const disableChunk = !!process.env.DISABLE_CHUNK || mode === "export";
 console.log("[Next] build with chunk: ", !disableChunk);
 const isProd = process.env.NODE_ENV === "production";
@@ -57,11 +56,11 @@ const nextConfig = {
       "thirdwx.qlogo.cn", //微信
     ],
   },
-  assetPrefix: getBasePath(), //加前缀
   basePath: getBasePath(), //node
-  publicRuntimeConfig: {
-    basePath: getBasePath(), //写入路径
-  },
+  //assetPrefix: getBasePath(), //加前缀
+  // publicRuntimeConfig: {
+  //   basePath: getBasePath(), //写入路径
+  // },
   experimental: {
     forceSwcTransforms: true,
   },
