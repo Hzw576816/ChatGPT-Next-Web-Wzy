@@ -18,7 +18,7 @@ RUN apk update && apk add --no-cache git
 
 ENV OPENAI_API_KEY=""
 ENV CODE=""
-
+ENV BASE_PATH="gpt-web"
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -33,7 +33,7 @@ RUN apk add proxychains-ng
 ENV PROXY_URL=""
 ENV OPENAI_API_KEY=""
 ENV CODE=""
-
+ENV BASE_PATH="gpt-web"
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
@@ -61,3 +61,5 @@ CMD if [ -n "$PROXY_URL" ]; then \
     else \
         node server.js; \
     fi
+#docker build -t chatgpt-next-web-wzy .
+#docker run -d -p 8016:3000 -e HIDE_USER_API_KEY=1  -e BASE_URL="http://39.104.53.56:8015/api"  chatgpt-next-web-wzy
