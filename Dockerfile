@@ -1,4 +1,5 @@
 FROM node:18-alpine AS base
+RUN echo "http://mirrors.aliyun.com/alpine/v3.14/main/" > /etc/apk/repositories && echo "http://mirrors.aliyun.com/alpine/v3.14/community/" >> /etc/apk/repositories
 
 FROM base AS deps
 
@@ -15,8 +16,8 @@ FROM base AS builder
 
 RUN apk update && apk add --no-cache git
 
-#ENV OPENAI_API_KEY=""
-#ENV CODE=""
+ENV OPENAI_API_KEY=""
+ENV CODE=""
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -29,16 +30,16 @@ WORKDIR /app
 
 RUN apk add proxychains-ng
 
-#ENV PROXY_URL=""
-#ENV OPENAI_API_KEY=""
-#ENV CODE=""
+ENV PROXY_URL=""
+ENV OPENAI_API_KEY=""
+ENV CODE=""
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/server ./.next/server
 
-EXPOSE 80
+EXPOSE 3000
 
 CMD if [ -n "$PROXY_URL" ]; then \
         export HOSTNAME="127.0.0.1"; \
