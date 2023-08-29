@@ -588,3 +588,105 @@ export function ComboListItem(props: {
     </div>
   );
 }
+
+export function OrderListItem(props: {
+  id: string;
+  totalAmount: string;
+  description: string;
+  orderNo: string;
+  ordersStatusText: string;
+  attrs?: any[];
+  payTime: string;
+  createTime: string;
+}) {
+  return (
+    <div className={styles["order-list-item"]}>
+      <div className={styles["container"]}>
+        <div className={styles["header"]}>
+          <div className={styles["title"]}>
+            订单号: {props.orderNo}
+            <div className={styles["sub-title"]}>{props.description}</div>
+          </div>
+          <div className={styles["right"]}>
+            <div className={styles["price"]}>￥ {props.totalAmount}</div>
+            <div className={styles["sub-title"]}>支付时间: {props.payTime}</div>
+          </div>
+        </div>
+        <div className={styles["body"]}>
+          {props.attrs?.map((item, index) => {
+            return (
+              <div
+                className={styles["item"]}
+                key={item.label + index + props.id}
+              >
+                <div className={styles["icon"]}>
+                  <IconButton
+                    style={{ background: "none", padding: "10px 0" }}
+                    icon={<PinIcon />}
+                  />
+                </div>
+                <div className={styles["label"]}>{item.label}</div>
+                <div className={styles["value"]}>{item.value}</div>
+                <div className={styles["unit"]}>{item.unit}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className={styles["order-status"] + " success"}>
+        {props.ordersStatusText}
+      </div>
+    </div>
+  );
+}
+
+export function BalanceListItem(props: {
+  id: string;
+  title: string;
+  endTime: string;
+  createTime: string;
+  status: string;
+  statusText: string;
+  attrs?: any[];
+}) {
+  return (
+    <div className={styles["order-list-item"] + " " + styles[props.status]}>
+      <div className={styles["container"]}>
+        <div className={styles["header"]}>
+          <div className={styles["title"]}>{props.title}</div>
+          <div className={styles["right"]}>
+            <div className={styles["price"]} style={{ fontSize: "18px" }}>
+              到期时间: {props.endTime}
+            </div>
+            <div className={styles["sub-title"]}>
+              购买时间: {props.createTime}
+            </div>
+          </div>
+        </div>
+        <div className={styles["body"]}>
+          {props.attrs?.map((item, index) => {
+            return (
+              <div
+                className={styles["item"]}
+                key={item.label + index + props.id}
+              >
+                <div className={styles["icon"]}>
+                  <IconButton
+                    style={{ background: "none", padding: "10px 0" }}
+                    icon={<PinIcon />}
+                  />
+                </div>
+                <div className={styles["label"]}>{item.label}</div>
+                <div className={styles["value"]}>{item.value}</div>
+                <div className={styles["unit"]}>{item.unit}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className={styles["order-status"] + " " + props.status}>
+        {props.statusText}
+      </div>
+    </div>
+  );
+}

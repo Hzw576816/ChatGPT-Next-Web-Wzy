@@ -311,6 +311,7 @@
   //border: 1px solid rgba(255, 255, 255, 0.192);
   //background-color: rgb(27 38 42); // rgb(29 29 53);
   position: relative;
+
   .container {
     .header {
       //height: 36px;
@@ -380,6 +381,7 @@
       }
     }
   }
+
   .charge-privilege {
     position: absolute;
     bottom: 0;
@@ -391,4 +393,94 @@
     border-top-left-radius: 12px;
     border-bottom-right-radius: 12px;
   }
+}
+
+.order-list-item {
+  margin-bottom: 16px;
+  position: relative;
+
+  .container {
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: rgba(27, 38, 42, 1);
+      padding: 12px 20px;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+
+      .title {
+        color: #E6A23C;
+        font-size: 16px;
+
+        .sub-title {
+          color:rgb(187, 187, 187);
+          font-size: 13px;
+          margin-top: 6px;
+        }
+      }
+
+      .right {
+        flex: 1;
+        display: flex;
+        align-items: flex-end;
+        flex-direction: column;
+
+        .price {
+          font-weight: 500;
+          font-size: 24px;
+        }
+
+        .sub-title {
+          font-size: 13px;
+          margin-top: 6px;
+        }
+      }
+    }
+
+    .body {
+      padding: 12px 20px;
+      background-color: rgba(27, 38, 42, .6);
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+
+      .item {
+        display: flex;
+        align-items: center;
+
+        .label {
+          margin-left: 8px;
+        }
+
+        .value {
+          font-weight: 550;
+          font-size: 20px;
+          padding: 0 6px;
+        }
+
+        .unit {
+
+        }
+      }
+    }
+  }
+
+  .order-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #fa2c19;
+    color: #fff;
+    border-top-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+}
+.success {
+
+}
+
+.expired {
+  filter: grayscale(1);
 }

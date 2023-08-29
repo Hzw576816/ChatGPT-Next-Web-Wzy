@@ -84,6 +84,14 @@ const Pay = dynamic(async () => (await import("./pay-pc")).PayPc, {
   loading: () => <Loading noLogo logoLoading />,
 });
 
+const Order = dynamic(async () => (await import("./order")).Order, {
+  loading: () => <Loading noLogo logoLoading />,
+});
+
+const Balance = dynamic(async () => (await import("./balance")).Balance, {
+  loading: () => <Loading noLogo logoLoading />,
+});
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -219,6 +227,8 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
                 />
                 <Route path={Path.Pricing} element={<Pricing />} />
                 <Route path={Path.Pay} element={<Pay />} />
+                <Route path={Path.Order} element={<Order />} />
+                <Route path={Path.Balance} element={<Balance />} />
               </Routes>
             </div>
           </>

@@ -40,7 +40,7 @@ export function PayPc() {
       setQrCode(attachData.CodeUrl);
       const { _ordersStatus } = order;
       if (_ordersStatus.name !== "Paid") {
-        // await checkIsPay();
+        await checkIsPay();
       }
     } else {
     }
@@ -55,15 +55,10 @@ export function PayPc() {
     } else {
       if (result.data === "Paid") {
         //已支付需要跳转页面了
-        console.log("支付成功");
+        showToast(Locale.PayPage.PaidSuccess);
         setIsPaid(true);
         setTimeout(() => {
-          // router.replace({
-          //     name: "orderDetail",
-          //     params: {
-          //         orderNo: orderNo.value
-          //     }
-          // })
+          navigate(Path.Balance);
         }, 1500);
       }
     }
@@ -76,7 +71,7 @@ export function PayPc() {
   }, []);
   return (
     <ErrorBoundary>
-      <div className="window-header">
+      <div className="window-header" data-tauri-drag-region>
         <div className="window-header-title">
           <div className="window-header-main-title">{"订单支付"}</div>
           {/*<div className="window-header-sub-title">{""}</div>*/}

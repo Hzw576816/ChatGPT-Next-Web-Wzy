@@ -189,3 +189,20 @@ export async function requestCheckPayOrderPaidApi(
 ): Promise<CallResult> {
   return request(`/app/orders/check-pay-status?orderNo=${orderNo}`, "POST", {});
 }
+
+/**
+ * 获取订单列表
+ */
+export async function requestMyOrderApi(): Promise<CallResult> {
+  return request(`/app/orders/list-recharge-orders`, "POST", {
+    pageIndex: 1,
+    pageSize: 2000,
+  });
+}
+
+/**
+ * 获取已购买套餐
+ */
+export async function requestMyComboRecordsApi(): Promise<CallResult> {
+  return request(`/app/user/own-combo-records`, "POST", {});
+}

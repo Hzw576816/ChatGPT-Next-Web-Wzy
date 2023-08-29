@@ -79,7 +79,7 @@ export function Pricing() {
           });
           row.attrs.push({
             label: "可用",
-            value: row.allowTokens,
+            value: row.frequency,
             unit: " 次聊天 (GTP-3.5)",
           });
           row.attrs.push({
@@ -117,6 +117,9 @@ export function Pricing() {
           if (res.status === 10) {
             showToast("支付成功");
             //跳转支付成功页面,去后台查询是否实际已支付成功
+            setTimeout(() => {
+              navigate(Path.Balance);
+            }, 1500);
             // router.replace({name: "paySuccess", query: {orderNo: result.orderNo}})
           } else {
             showToast("取消支付");
