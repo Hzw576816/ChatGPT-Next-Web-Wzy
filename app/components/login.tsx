@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styles from "./login.module.scss";
 import NextImage from "next/image";
 import { SingleInput, List, ListItem, PasswordInput } from "./ui-lib";
@@ -10,15 +10,33 @@ import { useNavigate } from "react-router-dom";
 import { showToast } from "../components/ui-lib";
 import { useMobileScreen } from "../utils";
 import { getClientConfig } from "../config/client";
-import { appid, isInWechat, redirectUrl } from "../utils/wechat";
+import {
+  appid,
+  isInWechat,
+  redirectUrl,
+  transitScanUrl,
+  wxAuthUrl,
+} from "../utils/wechat";
 import { useAppConfig, useAuthStore, useWebsiteConfigStore } from "../store";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
 import ChatBotIcon from "../icons/ai-chat-bot.jpg";
 import WechatIcon from "../icons/wechat.svg";
 import { wxAuth } from "@/app/hooks/useAuth";
-import "../../scripts/wxLogin.js";
 import ReturnIcon from "../icons/return.svg";
+import {
+  requestCheckScanStatusApi,
+  requestGenerateScanCodeApi,
+} from "@/app/requests";
+import QRCode from "qrcode.react";
+import ConfirmIcon from "@/app/icons/confirm.svg";
+import ReloadIcon from "@/app/icons/reload.svg";
+import { Loading } from "@/app/components/home";
+
+interface ScanResult {
+  code: string;
+  message: string;
+}
 
 export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   const navigate = useNavigate();
@@ -29,8 +47,10 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   const showMaxIcon = !isMobileScreen && !clientConfig?.isApp;
   const { loginPageSubTitle, mainTitle } = useWebsiteConfigStore();
   const [loadingUsage, setLoadingUsage] = useState(false);
+  const [loadingQrCode, setLoadingQrCode] = useState(false);
   const [showWechatCode, setShowWechatCode] = useState(false);
-
+  const [qrCode, setQrCode] = useState("");
+  const [scanResult, setScanResult] = useState<ScanResult>();
   useEffect(() => {
     const keydownEvent = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -44,20 +64,34 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const checkScan = (qrCode: string) => {
+    requestCheckScanStatusApi(qrCode).then((res) => {
+      if (res.code === 0) {
+        const { data } = res;
+        setScanResult(data);
+        if (data.code === "not-scan") {
+          setTimeout(() => {
+            checkScan(qrCode);
+          }, 1500);
+        }
+      }
+    });
+  };
+
+  function generateScanCode() {
+    requestGenerateScanCodeApi().then((result) => {
+      if (result.code === 0) {
+        const url = transitScanUrl(result.data);
+        setQrCode(url);
+        checkScan(result.data);
+      }
+      setLoadingQrCode(true);
+    });
+  }
   useEffect(() => {
     if (showWechatCode) {
       //生成二维码
-      // @ts-ignore
-      const obj = new WxLogin({
-        self_redirect: false,
-        id: "qrcode-container",
-        appid: appid,
-        scope: "snsapi_login",
-        redirect_uri: redirectUrl,
-        state: "STATE",
-        style: "",
-        href: "",
-      });
+      generateScanCode();
     }
   }, [showWechatCode]);
 
@@ -254,8 +288,68 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
                 justifyContent: "center",
                 paddingTop: "16px",
               }}
-              id="qrcode-container"
-            ></div>
+            >
+              <div
+                style={{
+                  padding: "8px",
+                  background: "#fff",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  width: "276px",
+                  height: "276px",
+                  position: "relative",
+                  justifyContent: "center",
+                }}
+              >
+                {loadingQrCode ? (
+                  <>
+                    <QRCode
+                      size={256}
+                      includeMargin
+                      imageSettings={{
+                        src: ChatBotIcon.src,
+                        height: 22,
+                        width: 36,
+                        excavate: true,
+                      }}
+                      value={qrCode}
+                    />
+                    <span style={{ fontSize: "14px" }}>
+                      请打开微信APP扫一扫
+                    </span>
+                  </>
+                ) : (
+                  <Loading noLogo logoLoading />
+                )}
+                {scanResult?.code === "success" ||
+                  (scanResult?.code === "expired" && (
+                    <div className={styles["icon-paid"]}>
+                      <IconButton
+                        type={
+                          scanResult.code === "expired" ? "danger" : "primary"
+                        }
+                        icon={
+                          scanResult.code === "expired" ? (
+                            <ReloadIcon />
+                          ) : (
+                            <ConfirmIcon />
+                          )
+                        }
+                        key="ok"
+                        onClick={() => {
+                          if (scanResult?.code === "expired") {
+                            generateScanCode();
+                          }
+                        }}
+                      />
+                      <span className={styles["text"]}>
+                        {scanResult.message}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
           ) : undefined}
           {showWechatCode ? (
             <div

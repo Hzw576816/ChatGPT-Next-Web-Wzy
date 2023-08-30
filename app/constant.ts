@@ -1,3 +1,5 @@
+import { TransitScan } from "@/app/components/transit-scan";
+
 export const OWNER = "Yidadaa";
 export const REPO = "ChatGPT-Next-Web";
 export const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
@@ -23,6 +25,7 @@ export enum Path {
   Profile = "/profile",
   Balance = "/balance",
   WxLogin = "/wxLogin",
+  TransitScan = "/transit-scan",
 }
 
 export enum SlotID {

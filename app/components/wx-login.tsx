@@ -1,7 +1,7 @@
 import { Loading } from "@/app/components/home";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { requestWxLoginApi } from "@/app/requests";
+import { requestScanLoginSaveApi, requestWxLoginApi } from "@/app/requests";
 import { showToast } from "../components/ui-lib";
 import { Path } from "../constant";
 import { useAuthStore } from "@/app/store";
@@ -15,15 +15,27 @@ export function WxLogin() {
   const from = params.get("from");
   const wxCode = params.get("code");
   const memberCard = !params.get("memberCard");
-  requestWxLoginApi(wxCode, memberCard).then((result) => {
-    alert(JSON.stringify(result));
-    if (result.code === 0) {
-      authStore.setLogin(result);
-      navigate(Path.Home);
-    } else {
-      showToast(result.message as string);
-      navigate(Path.Login);
+  const scanCode = params.get("scanCode");
+  useEffect(() => {
+    if (wxCode) {
+      if (scanCode) {
+        requestScanLoginSaveApi(wxCode, scanCode).then((result) => {
+          if (result.code === 0) {
+            alert(JSON.stringify(result));
+          }
+        });
+      } else {
+        requestWxLoginApi(wxCode, memberCard).then((result) => {
+          if (result.code === 0) {
+            authStore.setLogin(result);
+            navigate(Path.Home);
+          } else {
+            showToast(result.message as string);
+            navigate(Path.Login);
+          }
+        });
+      }
     }
-  });
+  }, []);
   return <Loading noLogo logoLoading />;
 }

@@ -96,6 +96,13 @@ const Profile = dynamic(async () => (await import("./profile")).Profile, {
   loading: () => <Loading noLogo logoLoading />,
 });
 
+const TransitScan = dynamic(
+  async () => (await import("./transit-scan")).TransitScan,
+  {
+    loading: () => <Loading noLogo logoLoading />,
+  },
+);
+
 const WxLogin = dynamic(async () => (await import("./wx-login")).WxLogin, {
   loading: () => <Loading noLogo logoLoading />,
 });
@@ -197,10 +204,10 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
     setFavicon(logoUrl, "");
   }, [logoUrl]);
 
-  const separator = ([Path.Login, Path.WxLogin] as string[]).includes(
-    location.pathname,
-  );
-  console.log(location.pathname);
+  const separator = (
+    [Path.Login, Path.WxLogin, Path.TransitScan] as string[]
+  ).includes(location.pathname);
+  console.log(separator, location.pathname, Path.Login);
   return (
     <div className={(separator ? "separator-page " : "") + "body"}>
       <div
@@ -242,6 +249,7 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
                 <Route path={Path.Balance} element={<Balance />} />
                 <Route path={Path.Profile} element={<Profile />} />
                 <Route path={Path.WxLogin} element={<WxLogin />} />
+                <Route path={Path.TransitScan} element={<TransitScan />} />
               </Routes>
             </div>
           </>

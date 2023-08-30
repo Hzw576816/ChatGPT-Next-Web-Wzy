@@ -221,3 +221,37 @@ export async function requestWxLoginApi(
     initiativeRegister,
   });
 }
+
+/**
+ * 微信网页授权登录-生成扫码唯一码
+ */
+export async function requestGenerateScanCodeApi(): Promise<CallResult> {
+  return request(`/app/user/generate-scan-code`, "POST", {});
+}
+
+/**
+ * 微信网页授权登录-手机扫码后通知服务端并存储授权码
+ * @param temporaryCode
+ * @param qrCode
+ */
+export async function requestScanLoginSaveApi(
+  temporaryCode: string,
+  qrCode: string,
+): Promise<CallResult> {
+  return request(`/app/user/scan-login-save`, "POST", {
+    temporaryCode,
+    qrCode,
+  });
+}
+
+/**
+ * 微信网页授权登录-校验检查扫码状态
+ * @param qrCode
+ */
+export async function requestCheckScanStatusApi(
+  qrCode: string,
+): Promise<CallResult> {
+  return request(`/app/user/check-scan-status`, "POST", {
+    qrCode,
+  });
+}

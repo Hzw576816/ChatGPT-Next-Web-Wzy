@@ -1,3 +1,5 @@
+import { Path } from "@/app/constant";
+
 export function isInWechat(): boolean {
   const agent = navigator.userAgent.toLowerCase();
   return agent.indexOf("micromessenger") != -1;
@@ -76,4 +78,15 @@ export function wxPayBridge(data: any) {
  */
 export const wxAuthUrl = (appid: string, url: string) => {
   return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=snsapi_userinfo&state=STATE&forcePopup=false&connect_redirect=1#wechat_redirect`;
+};
+
+/**
+ * 扫码中转,优化二维码过于数据太大
+ * @param code
+ */
+export const transitScanUrl = (code: string) => {
+  if (process.env.NODE_ENV == "development") {
+    return `http://192.168.11.190:3000/${Path.TransitScan}?scanCode=${code}`;
+  } else
+    return `http://chatgpt.weizhicloud.com/${Path.TransitScan}?scanCode=${code}`;
 };

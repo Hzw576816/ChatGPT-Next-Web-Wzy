@@ -75,3 +75,29 @@
   }
 }
 
+.icon-paid {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, .6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+
+  //i {
+  //  font-size: 48px;
+  //  color: #00c250;
+  //}
+
+  .text {
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    font-size: 14px;
+    color: rgba(255,255,255,.8);
+    letter-spacing: 0;
+  }
+}

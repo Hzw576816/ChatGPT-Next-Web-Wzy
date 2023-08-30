@@ -8,10 +8,9 @@ export function wxAuth(to: any = {}) {
     let urlParams = new URLSearchParams(query);
     const baseUrl = `${redirectUrl}?${urlParams.toString()}`;
     const enCodeUrl = encodeURIComponent(baseUrl);
-    console.log(wxAuthUrl(appid, `${enCodeUrl}`));
-    // if (process.env.NODE_ENV !== "development") {
-    location.replace(wxAuthUrl(appid, `${enCodeUrl}`));
-    // }
+    if (process.env.NODE_ENV !== "development") {
+      location.replace(wxAuthUrl(appid, `${enCodeUrl}`));
+    }
   } catch (e) {
     console.error(`错误:${e}`);
   }
