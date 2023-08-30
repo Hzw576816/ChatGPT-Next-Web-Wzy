@@ -3,6 +3,10 @@ export function isInWechat(): boolean {
   return agent.indexOf("micromessenger") != -1;
 }
 
+export const appid = "wxf103df5e7b296c46";
+
+export const redirectUrl = "http://chatgpt.weizhicloud.com/wxLogin";
+
 //微信浏览器内调起微信支付
 export function wxPayBridge(data: any) {
   return new Promise((resolve, reject) => {
