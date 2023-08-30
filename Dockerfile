@@ -18,7 +18,6 @@ RUN apk update && apk add --no-cache git
 
 ENV OPENAI_API_KEY=""
 ENV CODE=""
-ENV BASE_PATH="gpt-web"
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

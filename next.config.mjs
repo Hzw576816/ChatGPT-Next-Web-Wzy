@@ -56,7 +56,7 @@ const nextConfig = {
       "thirdwx.qlogo.cn", //微信
     ],
   },
-  basePath: getBasePath(), //node
+  // basePath: getBasePath(), //node
   // assetPrefix: getBasePath(), //加前缀
   // publicRuntimeConfig: {
   //   basePath: getBasePath(), //写入路径
