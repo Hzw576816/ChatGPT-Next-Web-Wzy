@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { StoreKey } from "../constant";
 import { CallResult, requestLogin } from "../requests";
+import { useChatStore } from "@/app/store/chat";
 
 export interface AuthStore {
   token: string;
@@ -52,6 +53,7 @@ export const useAuthStore = create<AuthStore>()(
           avatar: "",
           user: null,
         }));
+        useChatStore.getState().resetSession();
       },
       setLogin(result: CallResult) {
         set(() => ({

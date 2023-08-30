@@ -16,6 +16,7 @@ export function WxLogin() {
   const wxCode = params.get("code");
   const memberCard = !params.get("memberCard");
   requestWxLoginApi(wxCode, memberCard).then((result) => {
+    alert(JSON.stringify(result));
     if (result.code === 0) {
       authStore.setLogin(result);
       navigate(Path.Home);
