@@ -5,6 +5,8 @@ import { requestScanLoginSaveApi, requestWxLoginApi } from "@/app/requests";
 import { showToast } from "../components/ui-lib";
 import { Path } from "../constant";
 import { useAuthStore } from "@/app/store";
+import { wxAuth } from "@/app/hooks/useAuth";
+import { isInWechat } from "@/app/utils/wechat";
 
 export function WxLogin() {
   const navigate = useNavigate();
@@ -17,29 +19,28 @@ export function WxLogin() {
   const memberCard = !params.get("memberCard");
   const scanCode = params.get("scanCode");
   useEffect(() => {
-    const login = () => {
-      requestWxLoginApi(wxCode, memberCard).then((result) => {
-        if (result.code === 0) {
-          authStore.setLogin(result);
-          setTimeout(() => {
-            navigate(Path.Home);
-          }, 1000);
-        } else {
-          showToast(result.message as string);
-          navigate(Path.Login);
-        }
-      });
-    };
+    setLoading(true);
     if (wxCode) {
       if (scanCode) {
         requestScanLoginSaveApi(wxCode, scanCode).then((result) => {
           if (result.code === 0) {
             showToast(result.data.message as string);
-            login();
+            if (isInWechat()) wxAuth({});
           }
         });
       } else {
-        login();
+        requestWxLoginApi(wxCode, memberCard).then((result) => {
+          if (result.code === 0) {
+            authStore.setLogin(result);
+            setTimeout(() => {
+              navigate(Path.Home);
+            }, 1000);
+            setLoading(false);
+          } else {
+            showToast(result.message as string);
+            navigate(Path.Login);
+          }
+        });
       }
     }
   }, []);
