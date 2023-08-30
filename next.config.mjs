@@ -37,8 +37,8 @@ const nextConfig = {
     config.resolve.fallback = {
       child_process: false,
     };
-    config.output.publicPath =
-        getBasePath() + config.output.publicPath; //资源生成前缀
+    // config.output.publicPath =
+    //     getBasePath() + config.output.publicPath; //资源生成前缀
     return config;
   },
   output: mode,
@@ -57,7 +57,7 @@ const nextConfig = {
     ],
   },
   basePath: getBasePath(), //node
-  //assetPrefix: getBasePath(), //加前缀
+  // assetPrefix: getBasePath(), //加前缀
   // publicRuntimeConfig: {
   //   basePath: getBasePath(), //写入路径
   // },
