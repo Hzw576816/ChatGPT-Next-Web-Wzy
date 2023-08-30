@@ -26,9 +26,8 @@ export function Profile() {
     navigate(Path.Login);
   };
   useEffect(() => {
-    console.log(authStore.token);
     if (!authStore.token) {
-      // navigate(Path.Login);
+      navigate(Path.Login);
     }
   }, []);
 

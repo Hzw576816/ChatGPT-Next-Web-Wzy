@@ -21,14 +21,16 @@ export function WxLogin() {
       if (scanCode) {
         requestScanLoginSaveApi(wxCode, scanCode).then((result) => {
           if (result.code === 0) {
-            alert(JSON.stringify(result));
+            showToast(result.message as string);
           }
         });
       } else {
         requestWxLoginApi(wxCode, memberCard).then((result) => {
           if (result.code === 0) {
             authStore.setLogin(result);
-            navigate(Path.Home);
+            setTimeout(() => {
+              navigate(Path.Home);
+            }, 1000);
           } else {
             showToast(result.message as string);
             navigate(Path.Login);

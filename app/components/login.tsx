@@ -82,7 +82,10 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
           }, 1500);
         } else {
           if (data.code === "success") {
-            authStore.setLogin({ data } as CallResult);
+            authStore.setLogin({ code: 0, data: data.data } as CallResult);
+            setTimeout(() => {
+              navigate(Path.Home);
+            }, 1500);
           }
         }
       }
@@ -337,32 +340,30 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
                 ) : (
                   <Loading noLogo logoLoading />
                 )}
-                {scanResult?.code === "success" ||
-                  (scanResult?.code === "expired" && (
-                    <div className={styles["icon-paid"]}>
-                      <IconButton
-                        type={
-                          scanResult.code === "expired" ? "danger" : "primary"
+                {(scanResult?.code === "success" ||
+                  scanResult?.code === "expired") && (
+                  <div className={styles["icon-paid"]}>
+                    <IconButton
+                      type={
+                        scanResult.code === "expired" ? "danger" : "primary"
+                      }
+                      icon={
+                        scanResult.code === "expired" ? (
+                          <ReloadIcon />
+                        ) : (
+                          <ConfirmIcon />
+                        )
+                      }
+                      key="ok"
+                      onClick={() => {
+                        if (scanResult?.code === "expired") {
+                          generateScanCode();
                         }
-                        icon={
-                          scanResult.code === "expired" ? (
-                            <ReloadIcon />
-                          ) : (
-                            <ConfirmIcon />
-                          )
-                        }
-                        key="ok"
-                        onClick={() => {
-                          if (scanResult?.code === "expired") {
-                            generateScanCode();
-                          }
-                        }}
-                      />
-                      <span className={styles["text"]}>
-                        {scanResult.message}
-                      </span>
-                    </div>
-                  ))}
+                      }}
+                    />
+                    <span className={styles["text"]}>{scanResult.message}</span>
+                  </div>
+                )}
               </div>
             </div>
           ) : undefined}
