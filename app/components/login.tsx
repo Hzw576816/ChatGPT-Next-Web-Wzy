@@ -14,7 +14,9 @@ import { isInWechat } from "../utils/wechat";
 import { useAppConfig, useAuthStore, useWebsiteConfigStore } from "../store";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
-import ChatBotIcon from "../icons/ai-chat-bot.png";
+import ChatBotIcon from "../icons/ai-chat-bot.jpg";
+import WechatIcon from "../icons/wechat.svg";
+import { wxAuth } from "@/app/hooks/useAuth";
 
 export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   const navigate = useNavigate();
@@ -74,6 +76,15 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   function logout() {
     authStore.logout();
   }
+
+  function toWxLogin() {
+    if (isInWechat()) {
+      wxAuth({});
+    } else {
+      wxAuth({});
+    }
+  }
+
   return (
     <ErrorBoundary>
       <div className="window-header" data-tauri-drag-region>
@@ -115,8 +126,8 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
             ) : !props.logoUrl ? (
               <NextImage
                 src={ChatBotIcon.src}
-                width={64}
-                height={64}
+                width={94.64788868}
+                height={56}
                 alt="bot"
               />
             ) : (
@@ -140,6 +151,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
               <span>{authStore.username}</span>
             ) : (
               <SingleInput
+                tabIndex={1}
                 value={username}
                 placeholder={Locale.LoginPage.Username.Placeholder}
                 onChange={(e) => {
@@ -159,6 +171,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
               <PasswordInput
                 value={password}
                 type="text"
+                tabIndex={2}
                 placeholder={Locale.LoginPage.Password.Placeholder}
                 onChange={(e) => {
                   setPassword(e.currentTarget.value);
@@ -184,6 +197,31 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
               }}
             />
           </ListItem>
+
+          {!authStore.token ? (
+            <div
+              style={{
+                borderBottom: "var(--border-in-light)",
+                minHeight: "40px",
+                lineHeight: "40px",
+                padding: "10px 20px",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ margin: "0 auto", display: "inline-block" }}>
+                <IconButton
+                  icon={<WechatIcon />}
+                  type="second"
+                  text="微信登录"
+                  onClick={() => {
+                    toWxLogin();
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
         </List>
       </div>
     </ErrorBoundary>

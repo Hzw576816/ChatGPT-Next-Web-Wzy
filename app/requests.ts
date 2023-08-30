@@ -206,3 +206,18 @@ export async function requestMyOrderApi(): Promise<CallResult> {
 export async function requestMyComboRecordsApi(): Promise<CallResult> {
   return request(`/app/user/own-combo-records`, "POST", {});
 }
+
+/**
+ * 移动端微信登录
+ * @param temporaryCode
+ * @param initiativeRegister
+ */
+export async function requestWxLoginApi(
+  temporaryCode: string | null,
+  initiativeRegister: boolean,
+): Promise<CallResult> {
+  return request(`/app/user/wx-login`, "POST", {
+    temporaryCode,
+    initiativeRegister,
+  });
+}

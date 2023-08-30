@@ -22,6 +22,7 @@ export enum Path {
   Pay = "/pay",
   Profile = "/profile",
   Balance = "/balance",
+  WxLogin = "/wxLogin",
 }
 
 export enum SlotID {

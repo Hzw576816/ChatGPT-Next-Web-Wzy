@@ -118,7 +118,7 @@ export function Balance(props: { isProfile?: boolean }) {
         ) : (
           <></>
         )}
-        {balanceList.length &&
+        {balanceList.length > 0 ? (
           balanceList.map((item) => {
             return (
               <BalanceListItem
@@ -132,7 +132,10 @@ export function Balance(props: { isProfile?: boolean }) {
                 title={item.title}
               ></BalanceListItem>
             );
-          })}
+          })
+        ) : (
+          <></>
+        )}
         {!props.isProfile && (
           <List>
             <ListItem>

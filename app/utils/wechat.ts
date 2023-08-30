@@ -3,6 +3,7 @@ export function isInWechat(): boolean {
   return agent.indexOf("micromessenger") != -1;
 }
 
+//微信浏览器内调起微信支付
 export function wxPayBridge(data: any) {
   return new Promise((resolve, reject) => {
     let isLoad = false;
@@ -63,3 +64,12 @@ export function wxPayBridge(data: any) {
     }
   });
 }
+
+/**
+ * 微信授权网页
+ * @param appid
+ * @param url
+ */
+export const wxAuthUrl = (appid: string, url: string) => {
+  return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=snsapi_userinfo&state=STATE&forcePopup=false&connect_redirect=1#wechat_redirect`;
+};

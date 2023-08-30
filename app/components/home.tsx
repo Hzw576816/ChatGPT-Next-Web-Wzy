@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import styles from "./home.module.scss";
 import NextImage from "next/image";
 
-import ChatBotIcon from "../icons/ai-chat-bot.png";
+import ChatBotIcon from "../icons/ai-chat-bot.jpg";
 import BotIcon from "../icons/bot.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 
@@ -20,7 +20,7 @@ import { ErrorBoundary } from "./error";
 import { getISOLang, getLang } from "../locales";
 
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
@@ -93,6 +93,10 @@ const Balance = dynamic(async () => (await import("./balance")).Balance, {
 });
 
 const Profile = dynamic(async () => (await import("./profile")).Profile, {
+  loading: () => <Loading noLogo logoLoading />,
+});
+
+const WxLogin = dynamic(async () => (await import("./wx-login")).WxLogin, {
   loading: () => <Loading noLogo logoLoading />,
 });
 
@@ -193,7 +197,10 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
     setFavicon(logoUrl, "");
   }, [logoUrl]);
 
-  const separator = ([Path.Login] as string[]).includes(location.pathname);
+  const separator = ([Path.Login, Path.WxLogin] as string[]).includes(
+    location.pathname,
+  );
+  console.log(location.pathname);
   return (
     <div className={(separator ? "separator-page " : "") + "body"}>
       <div
@@ -234,6 +241,7 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
                 <Route path={Path.Order} element={<Order />} />
                 <Route path={Path.Balance} element={<Balance />} />
                 <Route path={Path.Profile} element={<Profile />} />
+                <Route path={Path.WxLogin} element={<WxLogin />} />
               </Routes>
             </div>
           </>
