@@ -31,7 +31,7 @@ import {
 } from "@/app/requests";
 import QRCode from "qrcode.react";
 import ConfirmIcon from "@/app/icons/confirm.svg";
-import ReloadIcon from "@/app/icons/reload.svg";
+import ReloadWhiteIcon from "@/app/icons/reload-white.svg";
 import { Loading } from "@/app/components/home";
 
 interface ScanResult {
@@ -349,7 +349,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
                       }
                       icon={
                         scanResult.code === "expired" ? (
-                          <ReloadIcon />
+                          <ReloadWhiteIcon />
                         ) : (
                           <ConfirmIcon />
                         )
