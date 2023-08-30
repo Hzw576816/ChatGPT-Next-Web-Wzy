@@ -18,6 +18,8 @@ import { Loading } from "@/app/components/home";
 import WechatPayLogo from "../icons/wechat-pay-logo.png";
 import ConfirmIcon from "@/app/icons/confirm.svg";
 
+let needCleanTimer: boolean;
+
 export function PayPc() {
   const navigate = useNavigate();
   const authStore = useAuthStore();
@@ -47,6 +49,9 @@ export function PayPc() {
   };
 
   const checkIsPay = async () => {
+    if (needCleanTimer) {
+      return false;
+    }
     let result = await requestCheckPayOrderPaidApi(orderNo);
     //未支付继续轮询
     if (result.data === "UnPaid") {
@@ -58,6 +63,7 @@ export function PayPc() {
         showToast(Locale.PayPage.PaidSuccess);
         setIsPaid(true);
         setTimeout(() => {
+          needCleanTimer = true;
           navigate(Path.Balance);
         }, 1500);
       }
@@ -68,6 +74,9 @@ export function PayPc() {
     getOrderInfo().finally(() => {
       setLoading(false);
     });
+    return () => {
+      needCleanTimer = true;
+    };
   }, []);
   return (
     <ErrorBoundary>

@@ -207,7 +207,6 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
   const separator = (
     [Path.Login, Path.WxLogin, Path.TransitScan] as string[]
   ).includes(location.pathname);
-  console.log(separator, location.pathname, Path.Login);
   return (
     <div className={(separator ? "separator-page " : "") + "body"}>
       <div

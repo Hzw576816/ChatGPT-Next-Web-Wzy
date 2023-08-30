@@ -25,6 +25,7 @@ import WechatIcon from "../icons/wechat.svg";
 import { wxAuth } from "@/app/hooks/useAuth";
 import ReturnIcon from "../icons/return.svg";
 import {
+  CallResult,
   requestCheckScanStatusApi,
   requestGenerateScanCodeApi,
 } from "@/app/requests";
@@ -37,6 +38,8 @@ interface ScanResult {
   code: string;
   message: string;
 }
+
+let needCleanTimer: boolean;
 
 export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   const navigate = useNavigate();
@@ -51,6 +54,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   const [showWechatCode, setShowWechatCode] = useState(false);
   const [qrCode, setQrCode] = useState("");
   const [scanResult, setScanResult] = useState<ScanResult>();
+
   useEffect(() => {
     const keydownEvent = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -65,6 +69,9 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   }, []);
 
   const checkScan = (qrCode: string) => {
+    if (needCleanTimer) {
+      return false;
+    }
     requestCheckScanStatusApi(qrCode).then((res) => {
       if (res.code === 0) {
         const { data } = res;
@@ -73,12 +80,17 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
           setTimeout(() => {
             checkScan(qrCode);
           }, 1500);
+        } else {
+          if (data.code === "success") {
+            authStore.setLogin({ data } as CallResult);
+          }
         }
       }
     });
   };
 
-  function generateScanCode() {
+  const generateScanCode = () => {
+    setLoadingQrCode(false);
     requestGenerateScanCodeApi().then((result) => {
       if (result.code === 0) {
         const url = transitScanUrl(result.data);
@@ -87,11 +99,15 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
       }
       setLoadingQrCode(true);
     });
-  }
+  };
+
   useEffect(() => {
     if (showWechatCode) {
+      needCleanTimer = false;
       //生成二维码
       generateScanCode();
+    } else {
+      needCleanTimer = true;
     }
   }, [showWechatCode]);
 
@@ -261,7 +277,6 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
               style={{
                 borderBottom: "var(--border-in-light)",
                 minHeight: "40px",
-                lineHeight: "40px",
                 padding: "10px 20px",
                 textAlign: "center",
               }}
