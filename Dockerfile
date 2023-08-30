@@ -63,4 +63,5 @@ CMD if [ -n "$PROXY_URL" ]; then \
         node server.js; \
     fi
 #docker build -t chatgpt-next-web-wzy .
-#docker run -d -p 8016:3000  -e BASE_URL="http://39.104.53.56:8015/api"  chatgpt-next-web-wzy
+#
+

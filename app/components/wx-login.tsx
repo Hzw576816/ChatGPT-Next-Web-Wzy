@@ -17,25 +17,29 @@ export function WxLogin() {
   const memberCard = !params.get("memberCard");
   const scanCode = params.get("scanCode");
   useEffect(() => {
+    const login = () => {
+      requestWxLoginApi(wxCode, memberCard).then((result) => {
+        if (result.code === 0) {
+          authStore.setLogin(result);
+          setTimeout(() => {
+            navigate(Path.Home);
+          }, 1000);
+        } else {
+          showToast(result.message as string);
+          navigate(Path.Login);
+        }
+      });
+    };
     if (wxCode) {
       if (scanCode) {
         requestScanLoginSaveApi(wxCode, scanCode).then((result) => {
           if (result.code === 0) {
-            showToast(result.message as string);
+            showToast(result.data.message as string);
+            login();
           }
         });
       } else {
-        requestWxLoginApi(wxCode, memberCard).then((result) => {
-          if (result.code === 0) {
-            authStore.setLogin(result);
-            setTimeout(() => {
-              navigate(Path.Home);
-            }, 1000);
-          } else {
-            showToast(result.message as string);
-            navigate(Path.Login);
-          }
-        });
+        login();
       }
     }
   }, []);
