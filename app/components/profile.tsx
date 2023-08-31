@@ -86,6 +86,16 @@ export function Profile() {
             <ListItem title={Locale.Profile.RegisterTime}>
               <span>{user.creationTime}</span>
             </ListItem>
+            <ListItem subTitle="以下仅展示最早到期的套餐">
+              <IconButton
+                text={Locale.Profile.Actions.All}
+                type="second"
+                style={{ flexShrink: 0 }}
+                onClick={() => {
+                  navigate(Path.Balance);
+                }}
+              />
+            </ListItem>
           </List>
         )}
         <Balance isProfile></Balance>

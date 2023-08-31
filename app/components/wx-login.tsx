@@ -1,7 +1,11 @@
 import { Loading } from "@/app/components/home";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { requestScanLoginSaveApi, requestWxLoginApi } from "@/app/requests";
+import {
+  CallResult,
+  requestScanLoginSaveApi,
+  requestWxLoginApi,
+} from "@/app/requests";
 import { showToast } from "../components/ui-lib";
 import { Path } from "../constant";
 import { useAuthStore } from "@/app/store";
@@ -25,7 +29,10 @@ export function WxLogin() {
         requestScanLoginSaveApi(wxCode, scanCode).then((result) => {
           if (result.code === 0) {
             showToast(result.data.message as string);
-            if (isInWechat()) wxAuth({});
+            authStore.setLogin({
+              code: 0,
+              data: result.data.data,
+            } as CallResult);
           }
         });
       } else {

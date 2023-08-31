@@ -203,8 +203,12 @@ export async function requestMyOrderApi(): Promise<CallResult> {
 /**
  * 获取已购买套餐
  */
-export async function requestMyComboRecordsApi(): Promise<CallResult> {
-  return request(`/app/user/own-combo-records`, "POST", {});
+export async function requestMyComboRecordsApi(
+  top?: boolean,
+): Promise<CallResult> {
+  return request(`/app/user/own-combo-records`, "POST", {
+    top,
+  });
 }
 
 /**

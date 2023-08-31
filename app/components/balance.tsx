@@ -40,7 +40,7 @@ export function Balance(props: { isProfile?: boolean }) {
   const [loading, setLoading] = useState(false);
 
   const getComboRecords = async () => {
-    let result = await requestMyComboRecordsApi();
+    let result = await requestMyComboRecordsApi(props.isProfile);
     if (result.code === 0) {
       result.data.forEach((row: Balance) => {
         if (!row.attrs) row.attrs = [];
