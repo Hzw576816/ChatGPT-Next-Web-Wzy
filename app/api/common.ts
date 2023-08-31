@@ -106,6 +106,7 @@ export async function request(req: NextRequest) {
     "/api/",
     "",
   );
+
   const timeoutId = setTimeout(() => {
     controller.abort();
   }, 10 * 60 * 1000);

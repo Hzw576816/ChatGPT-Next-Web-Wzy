@@ -10,13 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { showToast } from "../components/ui-lib";
 import { useMobileScreen } from "../utils";
 import { getClientConfig } from "../config/client";
-import {
-  appid,
-  isInWechat,
-  redirectUrl,
-  transitScanUrl,
-  wxAuthUrl,
-} from "../utils/wechat";
+import { isInWechat, transitScanUrl } from "../utils/wechat";
 import { useAppConfig, useAuthStore, useWebsiteConfigStore } from "../store";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
@@ -63,6 +57,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
     };
     document.addEventListener("keydown", keydownEvent);
     return () => {
+      needCleanTimer = true;
       document.removeEventListener("keydown", keydownEvent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -278,13 +273,19 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
           {!authStore.token && !showWechatCode ? (
             <div
               style={{
-                borderBottom: "var(--border-in-light)",
                 minHeight: "40px",
                 padding: "10px 20px",
                 textAlign: "center",
               }}
             >
-              <div style={{ margin: "0 auto", display: "inline-block" }}>
+              <div
+                style={{
+                  margin: "0 auto",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <IconButton
                   icon={<WechatIcon />}
                   type="second"
@@ -343,25 +344,31 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
                 {(scanResult?.code === "success" ||
                   scanResult?.code === "expired") && (
                   <div className={styles["icon-paid"]}>
-                    <IconButton
-                      type={
-                        scanResult.code === "expired" ? "danger" : "primary"
-                      }
-                      icon={
-                        scanResult.code === "expired" ? (
-                          <ReloadWhiteIcon />
-                        ) : (
-                          <ConfirmIcon />
-                        )
-                      }
-                      key="ok"
-                      onClick={() => {
-                        if (scanResult?.code === "expired") {
-                          generateScanCode();
-                        }
-                      }}
-                    />
+                    {scanResult?.code === "success" ? (
+                      <IconButton
+                        type="primary"
+                        icon={<ConfirmIcon />}
+                        key="ok"
+                        onClick={() => {
+                          if (scanResult?.code === "expired") {
+                            generateScanCode();
+                          }
+                        }}
+                      />
+                    ) : undefined}
+
                     <span className={styles["text"]}>{scanResult.message}</span>
+                    {scanResult?.code === "expired" ? (
+                      <IconButton
+                        type="primary"
+                        text="刷新"
+                        icon={<ReloadWhiteIcon />}
+                        key="ok"
+                        onClick={() => {
+                          generateScanCode();
+                        }}
+                      />
+                    ) : undefined}
                   </div>
                 )}
               </div>

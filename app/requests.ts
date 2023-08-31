@@ -1,6 +1,8 @@
 import type { Response } from "./api/common";
 import { getHeaders } from "@/app/client/api";
 import { Mask } from "@/app/store/mask";
+import { getClientConfig } from "@/app/config/client";
+import { DEFAULT_API_HOST } from "@/app/constant";
 
 export interface CallResult {
   code: number;
@@ -20,7 +22,8 @@ export async function request(
     const BASE_URL = process.env.BASE_URL;
     const mode = process.env.BUILD_MODE;
     let requestUrl = (mode === "export" ? BASE_URL : "") + "/api" + url;
-
+    const isApp = !!getClientConfig()?.isApp;
+    requestUrl = isApp ? DEFAULT_API_HOST + url : requestUrl;
     const res = await fetch(requestUrl, {
       method: method,
       headers: {
@@ -31,6 +34,7 @@ export async function request(
       // // @ts-ignore
       // duplex: "half",
     });
+    console.log("res", requestUrl);
     if (res.status === 401) {
       return {
         code: 401,
@@ -65,7 +69,6 @@ export async function request(
       };
     }
   } catch (err) {
-    console.log(err);
     options?.onError(err as Error);
     return {
       code: -1,
