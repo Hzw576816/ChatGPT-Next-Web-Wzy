@@ -33,6 +33,9 @@ export function WxLogin() {
               code: 0,
               data: result.data.data,
             } as CallResult);
+            setTimeout(() => {
+              navigate(Path.Home);
+            }, 1000);
           }
         });
       } else {
