@@ -42,19 +42,6 @@ export function Balance(props: { isProfile?: boolean }) {
   const getComboRecords = async () => {
     let result = await requestMyComboRecordsApi(props.isProfile);
     if (result.code === 0) {
-      result.data.forEach((row: Balance) => {
-        if (!row.attrs) row.attrs = [];
-        row.attrs.push({
-          label: "剩余",
-          value: row.extend.HasTokens,
-          unit: "Tokens",
-        });
-        row.attrs.push({
-          label: "可用",
-          value: row.extend["GPT-3-Frequency-Has"],
-          unit: " 次聊天 (GTP-3.5)",
-        });
-      });
       setBalanceList(result.data);
     }
   };

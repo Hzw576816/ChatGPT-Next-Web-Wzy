@@ -43,25 +43,6 @@ export function Order() {
   const getOrder = async () => {
     let result = await requestMyOrderApi();
     if (result.code === 0) {
-      result.data.items.forEach((row: Order) => {
-        if (!row.attrs) row.attrs = [];
-        const { attachData } = row;
-        row.attrs.push({
-          label: "可用",
-          value: attachData.AllowTokens,
-          unit: "Tokens",
-        });
-        row.attrs.push({
-          label: "可用",
-          value: attachData.Frequency,
-          unit: " 次聊天 (GTP-3.5)",
-        });
-        row.attrs.push({
-          label: "有效期",
-          value: `${attachData.Duration}`,
-          unit: "天",
-        });
-      });
       setOrderList(result.data.items);
     }
   };

@@ -85,8 +85,9 @@ export const wxAuthUrl = (appid: string, url: string) => {
  * @param code
  */
 export const transitScanUrl = (code: string) => {
+  let url = `http://chatgpt.weizhicloud.com/${Path.TransitScan}?scanCode=${code}`;
   if (process.env.NODE_ENV == "development") {
-    return `http://192.168.11.190:3000/${Path.TransitScan}?scanCode=${code}`;
-  } else
-    return `http://chatgpt.weizhicloud.com/${Path.TransitScan}?scanCode=${code}`;
+    // url = `http://192.168.11.190:3000/${Path.TransitScan}?scanCode=${code}`;
+  }
+  return url;
 };

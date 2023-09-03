@@ -129,18 +129,23 @@ export class ChatGPTApi implements LLMApi {
             ) {
               const responseTexts = [responseText];
               let extraInfo = await res.clone().text();
+              let resJson;
               try {
-                const resJson = await res.clone().json();
+                resJson = await res.clone().json();
                 extraInfo = prettyObject(resJson);
               } catch {}
 
               if (res.status === 401) {
                 responseTexts.push(Locale.Error.Unauthorized);
               } else {
-                if (extraInfo) {
-                  responseTexts.push(extraInfo);
+                if (resJson.hasOwnProperty("error") && resJson.error?.message) {
+                  responseTexts.push(resJson.error?.message);
                 } else {
-                  responseTexts.push(Locale.Error.Exception);
+                  if (extraInfo) {
+                    responseTexts.push(extraInfo);
+                  } else {
+                    responseTexts.push(Locale.Error.Exception);
+                  }
                 }
               }
               responseText = responseTexts.join("\n\n");

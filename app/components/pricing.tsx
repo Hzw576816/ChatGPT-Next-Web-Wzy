@@ -69,25 +69,6 @@ export function Pricing() {
     } else {
       if (result.data && result.data.length === 1) {
         let data = result.data[0];
-        data.memberShipCharges.forEach((row: memberShipCharge) => {
-          row.memberTypeId = data.id;
-          if (!row.attrs) row.attrs = [];
-          row.attrs.push({
-            label: "可用",
-            value: row.allowTokens,
-            unit: "Tokens",
-          });
-          row.attrs.push({
-            label: "可用",
-            value: row.frequency,
-            unit: " 次聊天 (GTP-3.5)",
-          });
-          row.attrs.push({
-            label: "有效期",
-            value: `${row.duration}`,
-            unit: "天",
-          });
-        });
         setComboData(data);
       }
       setTokenValid("valid");
