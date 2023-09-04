@@ -34,16 +34,13 @@ export async function request(
       // // @ts-ignore
       // duplex: "half",
     });
-    console.log("res", requestUrl);
     if (res.status === 401) {
       return {
         code: 401,
         message: "",
       };
     }
-    // res.text().then(ee=>{
-    //     console.log(ee,res)
-    // })
+
     let resText = await res.text();
     let response: any;
     try {
@@ -59,14 +56,21 @@ export async function request(
         data: json,
       };
     } else {
-      options?.onError({
-        name: "unknown error(1)",
-        message: response.error.message,
-      });
-      return {
-        code: -1,
-        message: response.error.message,
-      };
+      if (res.status == 204) {
+        return {
+          code: 0,
+          message: "操作成功",
+        };
+      } else {
+        options?.onError({
+          name: "unknown error(1)",
+          message: response.error.message,
+        });
+        return {
+          code: -1,
+          message: response.error.message,
+        };
+      }
     }
   } catch (err) {
     options?.onError(err as Error);
@@ -260,5 +264,17 @@ export async function requestCheckScanStatusApi(
 ): Promise<CallResult> {
   return request(`/app/user/check-scan-status`, "POST", {
     qrCode,
+  });
+}
+
+/**
+ *
+ * @param orderNo
+ */
+export async function requestPointToPayApi(
+  orderNo: string,
+): Promise<CallResult> {
+  return request("/app/orders/point-to-pay", "POST", {
+    orderNo,
   });
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styles from "./pricing.module.scss";
 import CloseIcon from "../icons/close.svg";
+import CancelIcon from "../icons/cancel.svg";
+import ConfirmIcon from "../icons/confirm.svg";
 import {
   Input,
   List,
@@ -9,6 +11,7 @@ import {
   Modal,
   PasswordInput,
   ComboListItem,
+  showConfirm,
 } from "./ui-lib";
 import { IconButton } from "./button";
 
@@ -25,6 +28,7 @@ import {
   CallResult,
   requestPayComboApi,
   requestComboList,
+  requestPointToPayApi,
 } from "@/app/requests";
 import { isInWechat, wxPayBridge } from "@/app/utils/wechat";
 
@@ -33,6 +37,7 @@ interface memberShipCharge {
   name: string;
   price: string;
   discountedPrice: string;
+  totalPoints: number;
   duration: number;
   givePoints: number;
   allowReChargeCount: number;
@@ -53,13 +58,70 @@ export interface ComboDto {
   isDefault: boolean;
 }
 
+//积分模态窗口
+export function IntegralModal(props: {
+  onClose: () => void;
+  name: string;
+  points: number;
+  orderNo: string;
+  loading: boolean;
+  onConfirm: (orderNo: string) => Promise<void>;
+}) {
+  return (
+    <div className="modal-mask">
+      <Modal
+        title={Locale.PricingPage.IntegralModal.Title}
+        onClose={() => props.onClose()}
+        actions={[
+          <IconButton
+            key="reset"
+            icon={<CancelIcon />}
+            bordered
+            text={Locale.PricingPage.IntegralModal.Cancel}
+            onClick={async () => {
+              props.onClose();
+            }}
+          />,
+          <IconButton
+            key="copy"
+            icon={<ConfirmIcon />}
+            disabled={props.loading}
+            bordered
+            text={Locale.PricingPage.IntegralModal.Confirm}
+            onClick={async () => {
+              await props.onConfirm(props.orderNo);
+              props.onClose();
+            }}
+          />,
+        ]}
+      >
+        <List>
+          <ListItem title={Locale.PricingPage.IntegralModal.Name}>
+            <span>{props.name}</span>
+          </ListItem>
+          <ListItem title={Locale.PricingPage.IntegralModal.NeedPointName}>
+            <span>{props.points}</span>
+          </ListItem>
+        </List>
+      </Modal>
+    </div>
+  );
+}
+
 export function Pricing() {
   const router = useRouter();
   const navigate = useNavigate();
   const authStore = useAuthStore();
 
+  const [showIntegralModal, setShowIntegralModal] = useState(false);
+  const [integralData, setIntegralData] = useState({
+    TotalPoints: 0,
+    Desc: "",
+    orderNo: "",
+  });
   const [comboData, setComboData] = useState({} as ComboDto);
   const [loading, setLoading] = useState(false);
+  const [loadingModal, setLoadingModal] = useState(false);
   const [isTokenValid, setTokenValid] = useState("unknown");
 
   const requestCombo = async () => {
@@ -91,28 +153,53 @@ export function Pricing() {
       item.id,
       isWx ? "JSAPI" : "NATIVE",
     );
-    if (isWx) {
-      wxPayBridge(result.data)
-        .then((res: any) => {
-          setLoading(false);
-          if (res.status === 10) {
-            showToast("支付成功");
-            //跳转支付成功页面,去后台查询是否实际已支付成功
-            setTimeout(() => {
-              navigate(Path.Balance);
-            }, 1500);
-            // router.replace({name: "paySuccess", query: {orderNo: result.orderNo}})
-          } else {
-            showToast("取消支付");
-          }
-        })
-        .catch((err) => {
-          setLoading(false);
-          showToast(err);
-        });
+    if (result.code === 0) {
+      //不是积分支付时,需跳转支付页
+      if (result.data.PayMode !== "Integral") {
+        if (isWx) {
+          wxPayBridge(result.data)
+            .then((res: any) => {
+              setLoading(false);
+              if (res.status === 10) {
+                showToast("支付成功");
+                //跳转支付成功页面,去后台查询是否实际已支付成功
+                setTimeout(() => {
+                  navigate(Path.Balance);
+                }, 1500);
+                // router.replace({name: "paySuccess", query: {orderNo: result.orderNo}})
+              } else {
+                showToast("取消支付");
+              }
+            })
+            .catch((err) => {
+              setLoading(false);
+              showToast(err);
+            });
+        } else {
+          navigate(Path.Pay + "?orderNo=" + result.data.orderNo);
+        }
+      } else {
+        setLoading(false);
+        setIntegralData(result.data);
+        setShowIntegralModal(true);
+      }
     } else {
-      navigate(Path.Pay + "?orderNo=" + result.data.orderNo);
+      setLoading(false);
+      showToast(result.message as string);
     }
+  }
+
+  //积分支付确认
+  async function handleToBuyByPoint(orderNo: string) {
+    setLoadingModal(true);
+    let result = await requestPointToPayApi(orderNo);
+    if (result.code === 0) {
+      showToast(Locale.PayPage.PaidSuccess);
+      navigate(Path.Order);
+    } else {
+      showToast(result.message as string);
+    }
+    setLoadingModal(false);
   }
 
   return (
@@ -164,6 +251,7 @@ export function Pricing() {
             <ComboListItem
               allowReChargeCount={item.allowReChargeCount}
               id={item.id}
+              totalPoints={item.totalPoints}
               attrs={item.attrs}
               title={item.name}
               discountedPrice={item.discountedPrice}
@@ -171,7 +259,11 @@ export function Pricing() {
               key={item.id}
             >
               <IconButton
-                text={Locale.PricingPage.Actions.Buy}
+                text={
+                  item.discountedPrice !== "0.00"
+                    ? Locale.PricingPage.Actions.Buy
+                    : Locale.PricingPage.Actions.PointBuy
+                }
                 type="danger"
                 block={true}
                 disabled={loading}
@@ -183,6 +275,16 @@ export function Pricing() {
           );
         })}
 
+        {showIntegralModal && (
+          <IntegralModal
+            loading={loadingModal}
+            orderNo={integralData.orderNo}
+            onConfirm={handleToBuyByPoint}
+            name={integralData.Desc}
+            points={integralData.TotalPoints}
+            onClose={() => setShowIntegralModal(false)}
+          ></IntegralModal>
+        )}
         <List>
           <ListItem>
             <IconButton

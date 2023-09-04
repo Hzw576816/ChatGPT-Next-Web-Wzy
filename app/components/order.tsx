@@ -11,10 +11,16 @@ import { Loading } from "@/app/components/home";
 
 import { List, ListItem, OrderListItem } from "./ui-lib";
 
+interface EnumEntity {
+  name: string;
+  text: string;
+}
+
 interface Order {
   id: string;
   orderNo: string;
   totalAmount: string;
+  totalPoints: number;
   description: string;
   ordersStatus: number;
   ordersType: number;
@@ -32,6 +38,7 @@ interface Order {
   };
   attrs: any[];
   payMode: number;
+  _payMode: EnumEntity;
 }
 
 export function Order() {
@@ -106,6 +113,8 @@ export function Order() {
           orderList.map((item) => {
             return (
               <OrderListItem
+                totalPoints={item.totalPoints}
+                payMode={item._payMode.name}
                 payTime={item.payTime}
                 createTime={item.creationTime}
                 ordersStatusText={item.ordersStatusText}

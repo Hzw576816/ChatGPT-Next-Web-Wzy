@@ -10,7 +10,8 @@ import CancelIcon from "../icons/cancel.svg";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
 import PinIcon from "../icons/pin.svg";
-
+import WxPayImg from "../icons/wx-pay.png";
+import pointPayImg from "../icons/point-pay.png";
 import Locale from "../locales";
 
 import { createRoot } from "react-dom/client";
@@ -18,6 +19,8 @@ import React, { HTMLProps, useEffect, useState } from "react";
 import { IconButton } from "./button";
 import { copyToClipboard } from "../utils";
 import GithubIcon from "@/app/icons/github.svg";
+import { Path } from "@/app/constant";
+import NextImage from "next/image";
 
 export function Popover(props: {
   children: JSX.Element;
@@ -541,6 +544,7 @@ export function ComboListItem(props: {
   id?: string;
   title?: string;
   price?: string;
+  totalPoints?: number;
   allowReChargeCount: number;
   discountedPrice?: string;
   attrs: any[];
@@ -552,10 +556,18 @@ export function ComboListItem(props: {
         <div className={styles["header"]}>
           <div className={styles["title"]}>{props.title}</div>
           <div className={styles["right"]}>
-            <div className={styles["price"]}>
-              ￥ {props.discountedPrice}
-              <span className={styles["origin-price"]}>￥ {props.price}</span>
-            </div>
+            {props.discountedPrice !== "0.00" ? (
+              <div className={styles["price"]}>
+                ￥ {props.discountedPrice}
+                <span className={styles["origin-price"]}>￥ {props.price}</span>
+              </div>
+            ) : (
+              <div className={styles["price"]}>
+                {props.totalPoints}{" "}
+                <span style={{ fontSize: "14px" }}>积分</span>
+              </div>
+            )}
+
             <div className={styles["action"]}>{props.children}</div>
           </div>
         </div>
@@ -592,12 +604,14 @@ export function ComboListItem(props: {
 export function OrderListItem(props: {
   id: string;
   totalAmount: string;
+  totalPoints: number;
   description: string;
   orderNo: string;
   ordersStatusText: string;
   attrs?: any[];
   payTime: string;
   createTime: string;
+  payMode: string;
 }) {
   return (
     <div className={styles["order-list-item"]}>
@@ -608,7 +622,15 @@ export function OrderListItem(props: {
             <div className={styles["sub-title"]}>{props.description}</div>
           </div>
           <div className={styles["right"]}>
-            <div className={styles["price"]}>￥ {props.totalAmount}</div>
+            {props.payMode === "WxPay" && (
+              <div className={styles["price"]}>￥ {props.totalAmount}</div>
+            )}
+            {props.payMode === "Integral" && (
+              <div className={styles["price"]}>
+                {props.totalPoints}
+                <span style={{ fontSize: "14px" }}> 积分</span>
+              </div>
+            )}
             <div className={styles["sub-title"]}>支付时间: {props.payTime}</div>
           </div>
         </div>
@@ -631,6 +653,24 @@ export function OrderListItem(props: {
               </div>
             );
           })}
+          <div className={styles["order-pay-mode"]}>
+            {props.payMode === "WxPay" && (
+              <NextImage
+                src={WxPayImg.src}
+                width={40}
+                height={33.33}
+                alt="pay"
+              />
+            )}
+            {props.payMode === "Integral" && (
+              <NextImage
+                src={pointPayImg.src}
+                width={40}
+                height={40}
+                alt="pay"
+              />
+            )}
+          </div>
         </div>
       </div>
       <div className={styles["order-status"] + " success"}>

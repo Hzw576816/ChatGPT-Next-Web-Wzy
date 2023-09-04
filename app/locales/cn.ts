@@ -1,5 +1,6 @@
 import { getClientConfig } from "../config/client";
 import { SubmitKey } from "../store/config";
+import { IntegralModal } from "@/app/components/pricing";
 
 const isApp = !!getClientConfig()?.isApp;
 
@@ -16,6 +17,7 @@ const cn = {
     Actions: {
       Close: "关闭",
       Buy: " 购 买 ",
+      PointBuy: "积分购买 ",
       Order: "订单中心",
       RedeemCode: "兑换码",
     },
@@ -26,6 +28,13 @@ const cn = {
     BuyFailedCause: "套餐购买失败！原因：",
     TOO_FREQUENCILY: "操作过于频繁，请稍后再试",
     CREATE_ORDER_FAILED: "创建订单失败",
+    IntegralModal: {
+      Title: "积分支付",
+      Cancel: "取 消",
+      Confirm: "确认支付",
+      Name: "购买套餐名称",
+      NeedPointName: "所需积分",
+    },
   },
   PayPage: {
     PaidSuccess: "支付成功",

@@ -333,6 +333,7 @@ function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
+  isShowText?: boolean;
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -352,9 +353,16 @@ function ChatAction(props: {
     });
   }
 
+  useEffect(() => {
+    if (props.isShowText) {
+      updateWidth();
+    }
+  }, []);
   return (
     <div
-      className={`${styles["chat-input-action"]} clickable`}
+      className={`${styles["chat-input-action"]} clickable ${
+        props.isShowText && styles["show-text"]
+      }`}
       onClick={() => {
         props.onClick();
         setTimeout(updateWidth, 1);
@@ -515,6 +523,7 @@ export function ChatActions(props: {
       />
 
       <ChatAction
+        isShowText={true}
         onClick={() => setShowModelSelector(true)}
         text={currentModel}
         icon={<RobotIcon />}
