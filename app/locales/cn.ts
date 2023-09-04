@@ -17,7 +17,7 @@ const cn = {
     Actions: {
       Close: "关闭",
       Buy: " 购 买 ",
-      PointBuy: "积分购买 ",
+      PointBuy: "积分购买",
       Order: "订单中心",
       RedeemCode: "兑换码",
     },
