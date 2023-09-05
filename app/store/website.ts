@@ -14,7 +14,7 @@ export const useWebsiteConfigStore = create<WebsiteConfigStore>()(
   persist(
     (set, get) => ({
       title: "",
-      mainTitle: "GPT",
+      mainTitle: "共享AI",
       subTitle: "",
       loginPageSubTitle: "",
       logoUrl: "",

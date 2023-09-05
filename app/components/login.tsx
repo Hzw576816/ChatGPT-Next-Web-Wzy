@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "./login.module.scss";
 import NextImage from "next/image";
-import { SingleInput, List, ListItem, PasswordInput } from "./ui-lib";
+import { SingleInput, List, ListItem, PasswordInput, Modal } from "./ui-lib";
 import { IconButton } from "./button";
 import Locale from "../locales";
-import { Path } from "../constant";
+import { Path, PrivacyAgreement, ServiceAgreement } from "../constant";
 import { ErrorBoundary } from "./error";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { showToast } from "../components/ui-lib";
 import { useMobileScreen } from "../utils";
 import { getClientConfig } from "../config/client";
@@ -27,6 +27,7 @@ import QRCode from "qrcode.react";
 import ConfirmIcon from "@/app/icons/confirm.svg";
 import ReloadWhiteIcon from "@/app/icons/reload-white.svg";
 import { Loading } from "@/app/components/home";
+import CancelIcon from "@/app/icons/cancel.svg";
 
 interface ScanResult {
   code: string;
@@ -34,6 +35,43 @@ interface ScanResult {
 }
 
 let needCleanTimer: boolean;
+
+export function ContentModal(props: {
+  content: string;
+  title: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-mask">
+      <Modal
+        title={props.title}
+        onClose={() => props.onClose()}
+        actions={[
+          <IconButton
+            key="reset"
+            icon={<CancelIcon />}
+            bordered
+            text={Locale.LoginPage.PolicyModal.Cancel}
+            onClick={async () => {
+              props.onClose();
+            }}
+          />,
+          <IconButton
+            key="copy"
+            icon={<ConfirmIcon />}
+            bordered
+            text={Locale.LoginPage.PolicyModal.Confirm}
+            onClick={() => {
+              props.onClose();
+            }}
+          />,
+        ]}
+      >
+        <div style={{ whiteSpace: "pre-wrap" }}>{props.content}</div>
+      </Modal>
+    </div>
+  );
+}
 
 export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   const navigate = useNavigate();
@@ -48,6 +86,8 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   const [showWechatCode, setShowWechatCode] = useState(false);
   const [qrCode, setQrCode] = useState("");
   const [scanResult, setScanResult] = useState<ScanResult>();
+  const [privacyAgreementModal, setPrivacyAgreementModal] = useState(false);
+  const [serviceAgreementModal, setServiceAgreementModal] = useState(false);
 
   useEffect(() => {
     const keydownEvent = (e: KeyboardEvent) => {
@@ -111,6 +151,7 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [partners, setPartners] = useState(false);
 
   function login() {
     if (!username) {
@@ -120,6 +161,11 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
 
     if (!password) {
       showToast(Locale.LoginPage.Toast.EmptyPassword);
+      return;
+    }
+
+    if (!partners) {
+      showToast("请先勾选服务协议和隐私协议");
       return;
     }
 
@@ -146,6 +192,10 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
   }
 
   function toWxLogin() {
+    if (!partners) {
+      showToast("请先勾选服务协议和隐私协议");
+      return;
+    }
     if (isInWechat()) {
       wxAuth({});
     } else {
@@ -249,6 +299,33 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
               />
             </ListItem>
           )}
+          {!authStore.token && !showWechatCode ? (
+            <ListItem>
+              <div className={styles["partners-policy"]}>
+                <input
+                  type="checkbox"
+                  checked={partners}
+                  onChange={(e) => {
+                    setPartners(e.currentTarget.checked);
+                  }}
+                ></input>
+                勾选即同意
+                <span
+                  onClick={() => setServiceAgreementModal(true)}
+                  className={styles["policy-a"]}
+                >
+                  服务协议
+                </span>
+                和
+                <span
+                  onClick={() => setPrivacyAgreementModal(true)}
+                  className={styles["policy-a"]}
+                >
+                  共享AI隐私协议
+                </span>
+              </div>
+            </ListItem>
+          ) : undefined}
           {!showWechatCode ? (
             <ListItem>
               <IconButton
@@ -399,6 +476,20 @@ export function Login(props: { logoLoading: boolean; logoUrl?: string }) {
             <></>
           )}
         </List>
+        {serviceAgreementModal && (
+          <ContentModal
+            title="服务协议"
+            content={ServiceAgreement}
+            onClose={() => setServiceAgreementModal(false)}
+          ></ContentModal>
+        )}
+        {privacyAgreementModal && (
+          <ContentModal
+            title="隐私协议"
+            content={PrivacyAgreement}
+            onClose={() => setPrivacyAgreementModal(false)}
+          ></ContentModal>
+        )}
       </div>
     </ErrorBoundary>
   );

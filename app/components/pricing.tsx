@@ -30,7 +30,7 @@ import {
   requestComboList,
   requestPointToPayApi,
 } from "@/app/requests";
-import { isInWechat, wxPayBridge } from "@/app/utils/wechat";
+import { IsInPc, wxPayBridge } from "@/app/utils/wechat";
 
 interface memberShipCharge {
   id: string;
@@ -146,7 +146,7 @@ export function Pricing() {
 
   async function handleToBuy(item: memberShipCharge) {
     //判断环境
-    let isWx = isInWechat();
+    let isWx = !IsInPc();
     setLoading(true);
     let result = await requestPayComboApi(
       item.memberTypeId,

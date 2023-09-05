@@ -337,7 +337,7 @@ const cn = {
     },
     HistoryCount: {
       Title: "附带历史消息数",
-      SubTitle: "每次请求携带的历史消息数",
+      SubTitle: "每次请求携带的历史消息数(注:超过1000tokens会计算额外询问次数)",
     },
     CompressThreshold: {
       Title: "历史消息长度压缩阈值",
@@ -515,6 +515,10 @@ const cn = {
     },
     GoToRegister: "前往注册",
     ForgetPassword: "忘记/重置密码",
+    PolicyModal: {
+      Cancel: "取消",
+      Confirm: "同意",
+    },
   },
 };
 

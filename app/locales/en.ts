@@ -163,6 +163,10 @@ const en: LocaleType = {
     },
     GoToRegister: "前往注册",
     ForgetPassword: "忘记/重置密码",
+    PolicyModal: {
+      Cancel: "取消",
+      Confirm: "同意",
+    },
   },
   Error_del: {
     Unauthorized: isApp

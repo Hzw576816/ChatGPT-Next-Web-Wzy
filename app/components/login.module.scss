@@ -5,6 +5,19 @@
   max-width: 600px;
   margin: 10px auto;
   box-sizing: border-box;
+
+  .partners-policy {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    justify-content: center;
+    .policy-a {
+      //color: #58a6ff;
+      color: rgb(29, 147, 171);
+      cursor: pointer;
+    }
+  }
 }
 
 .avatar {
@@ -20,6 +33,7 @@
     margin-bottom: 20px;
     text-align: left;
   }
+
   .edit-prompt-content {
     max-width: unset;
   }
@@ -56,6 +70,7 @@
           line-height: 2;
           font-weight: bold;
         }
+
         .user-prompt-content {
           font-size: 12px;
         }
@@ -97,7 +112,7 @@
     font-family: PingFangSC-Medium;
     font-weight: 500;
     font-size: 14px;
-    color: rgba(255,255,255,.8);
+    color: rgba(255, 255, 255, .8);
     letter-spacing: 0;
   }
 }
