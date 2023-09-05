@@ -544,7 +544,7 @@ export function ComboListItem(props: {
   id?: string;
   title?: string;
   price?: string;
-  totalPoints?: number;
+  totalPoints: number;
   allowReChargeCount: number;
   discountedPrice?: string;
   attrs: any[];
@@ -559,15 +559,24 @@ export function ComboListItem(props: {
             {props.discountedPrice !== "0.00" ? (
               <div className={styles["price"]}>
                 ￥ {props.discountedPrice}
+                {props.discountedPrice !== "0.00" && props.totalPoints > 0 && (
+                  <span> + </span>
+                )}
+                {props.totalPoints > 0 && (
+                  <span style={{ fontSize: "16px" }}>
+                    {" "}
+                    {props.totalPoints} 积分
+                  </span>
+                )}
                 <span className={styles["origin-price"]}>￥ {props.price}</span>
               </div>
-            ) : (
+            ) : undefined}
+            {props.totalPoints > 0 && props.discountedPrice === "0.00" && (
               <div className={styles["price"]}>
-                {props.totalPoints}{" "}
-                <span style={{ fontSize: "14px" }}>积分</span>
+                {props.totalPoints}
+                <span style={{ fontSize: "16px" }}> 积分</span>
               </div>
             )}
-
             <div className={styles["action"]}>{props.children}</div>
           </div>
         </div>
@@ -669,6 +678,22 @@ export function OrderListItem(props: {
                 height={40}
                 alt="pay"
               />
+            )}
+            {props.payMode === "IntegralWxPay" && (
+              <>
+                <NextImage
+                  src={WxPayImg.src}
+                  width={40}
+                  height={33.33}
+                  alt="pay"
+                />
+                <NextImage
+                  src={pointPayImg.src}
+                  width={40}
+                  height={40}
+                  alt="pay"
+                />
+              </>
             )}
           </div>
         </div>

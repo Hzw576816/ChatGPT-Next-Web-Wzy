@@ -70,3 +70,5 @@ export const useAuthStore = create<AuthStore>()(
     },
   ),
 );
+
+export default useAuthStore;

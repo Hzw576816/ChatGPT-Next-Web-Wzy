@@ -3,6 +3,7 @@ import { getHeaders } from "@/app/client/api";
 import { Mask } from "@/app/store/mask";
 import { getClientConfig } from "@/app/config/client";
 import { DEFAULT_API_HOST } from "@/app/constant";
+import authStore from "@/app/store/auth";
 
 export interface CallResult {
   code: number;
@@ -35,6 +36,7 @@ export async function request(
       // duplex: "half",
     });
     if (res.status === 401) {
+      authStore.getState().logout();
       return {
         code: 401,
         message: "",
@@ -73,6 +75,7 @@ export async function request(
       }
     }
   } catch (err) {
+    console.log(err);
     options?.onError(err as Error);
     return {
       code: -1,
@@ -277,4 +280,11 @@ export async function requestPointToPayApi(
   return request("/app/orders/point-to-pay", "POST", {
     orderNo,
   });
+}
+
+/**
+ * 获取会员
+ */
+export async function requestGetMemberApi(): Promise<CallResult> {
+  return request("/app/user/get-member", "POST", {});
 }

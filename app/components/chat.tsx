@@ -353,16 +353,14 @@ function ChatAction(props: {
     });
   }
 
-  useEffect(() => {
-    if (props.isShowText) {
-      updateWidth();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (props.isShowText) {
+  //     updateWidth();
+  //   }
+  // }, []);
   return (
     <div
-      className={`${styles["chat-input-action"]} clickable ${
-        props.isShowText && styles["show-text"]
-      }`}
+      className={`${styles["chat-input-action"]} clickable`}
       onClick={() => {
         props.onClick();
         setTimeout(updateWidth, 1);

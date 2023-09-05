@@ -47,6 +47,7 @@ export enum StoreKey {
   Sync = "sync",
   Auth = "auth",
   WebsiteConfig = "website-config",
+  Profile = "profile",
 }
 
 export const MAX_SIDEBAR_WIDTH = 500;

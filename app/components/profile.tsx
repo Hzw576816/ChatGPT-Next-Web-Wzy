@@ -6,20 +6,24 @@ import { IconButton } from "./button";
 import CloseIcon from "../icons/close.svg";
 import { Path } from "../constant";
 import styles from "./profile.module.scss";
-import { useAuthStore } from "../store";
+import { useAuthStore, useProfileStore } from "../store";
 import { List, ListItem, Popover } from "@/app/components/ui-lib";
 import { AvatarImg } from "@/app/components/avatar-img";
 import dynamic from "next/dynamic";
 import { Loading } from "@/app/components/home";
+import { requestGetMemberApi } from "@/app/requests";
 
 const Balance = dynamic(async () => (await import("./balance")).Balance, {
   loading: () => <Loading noLogo logoLoading />,
 });
+
 export function Profile() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const authStore = useAuthStore();
+  const profileStore = useProfileStore();
   const { avatar, user } = authStore;
+  const { member } = profileStore;
 
   const logout = () => {
     authStore.logout();
@@ -29,6 +33,11 @@ export function Profile() {
     if (!authStore.token) {
       navigate(Path.Login);
     }
+    requestGetMemberApi().then((result) => {
+      if (result.code === 0) {
+        profileStore.setMember(result.data);
+      }
+    });
   }, []);
 
   return (
@@ -83,6 +92,12 @@ export function Profile() {
             ) : (
               <></>
             )}
+            <ListItem title={Locale.Profile.Point}>
+              <span>{member?.usablePoints || "0"}</span>
+            </ListItem>
+            <ListItem title={Locale.Profile.MemberCard}>
+              <span>{member?.memberCard || "0"}</span>
+            </ListItem>
             <ListItem title={Locale.Profile.RegisterTime}>
               <span>{user.creationTime}</span>
             </ListItem>

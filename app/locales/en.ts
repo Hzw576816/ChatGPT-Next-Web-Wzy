@@ -87,6 +87,8 @@ const en: LocaleType = {
     Username: "微信名",
     Email: "邮箱",
     Phone: "手机号",
+    Point: "当前积分",
+    MemberCard: "会员卡号",
     RegisterTime: "注册时间",
     InviteCode: {
       Title: "邀请码(选填)",
