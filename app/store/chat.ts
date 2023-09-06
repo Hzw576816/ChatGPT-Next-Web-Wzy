@@ -631,31 +631,32 @@ export const useChatStore = create<ChatStore>()(
           historyMsgLength > modelConfig.compressMessageLengthThreshold &&
           modelConfig.sendMemory
         ) {
-          api.llm.chat({
-            messages: toBeSummarizedMsgs.concat(
-              createMessage({
-                role: "system",
-                content: Locale.Store.Prompt.Summarize,
-                date: "",
-              }),
-            ),
-            config: {
-              ...modelConfig,
-              stream: true,
-              model: "gpt-3.5-turbo",
-              chatId: session.id,
-            },
-            onUpdate(message) {
-              session.memoryPrompt = message;
-            },
-            onFinish(message) {
-              console.log("[Memory] ", message);
-              session.lastSummarizeIndex = lastSummarizeIndex;
-            },
-            onError(err) {
-              console.error("[Summarize] ", err);
-            },
-          });
+          // todo 这里是历史上下文汇总
+          // api.llm.chat({
+          //   messages: toBeSummarizedMsgs.concat(
+          //     createMessage({
+          //       role: "system",
+          //       content: Locale.Store.Prompt.Summarize,
+          //       date: "",
+          //     }),
+          //   ),
+          //   config: {
+          //     ...modelConfig,
+          //     stream: true,
+          //     model: "gpt-3.5-turbo",
+          //     chatId: session.id,
+          //   },
+          //   onUpdate(message) {
+          //     session.memoryPrompt = message;
+          //   },
+          //   onFinish(message) {
+          //     console.log("[Memory] ", message);
+          //     session.lastSummarizeIndex = lastSummarizeIndex;
+          //   },
+          //   onError(err) {
+          //     console.error("[Summarize] ", err);
+          //   },
+          // });
         }
       },
 
