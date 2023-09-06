@@ -263,7 +263,7 @@ export class ChatGPTApi implements LLMApi {
     //   return DEFAULT_MODELS.slice();
     // }
     const res = await fetch(this.path(OpenaiPath.ListModelPath), {
-      method: "GET",
+      method: "POST",
       headers: {
         ...getHeaders(),
       },
@@ -271,7 +271,7 @@ export class ChatGPTApi implements LLMApi {
 
     const resJson = (await res.json()) as OpenAIListModelResponse;
     const chatModels = resJson.data?.filter((m) => m.id.startsWith("gpt-"));
-    console.log("[Models]", chatModels);
+    // console.log("[Models]", chatModels);
 
     if (!chatModels) {
       return [];
