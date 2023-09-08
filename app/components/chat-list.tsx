@@ -25,7 +25,7 @@ export function ChatItem(props: {
   onDelete?: () => void;
   title: string;
   count: number;
-  time: string;
+  time: string | undefined;
   selected: boolean;
   id: string;
   index: number;
