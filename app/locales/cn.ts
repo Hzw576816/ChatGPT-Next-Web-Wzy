@@ -1,6 +1,5 @@
 import { getClientConfig } from "../config/client";
 import { SubmitKey } from "../store/config";
-import { IntegralModal } from "@/app/components/pricing";
 
 const isApp = !!getClientConfig()?.isApp;
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { requestGetSettingApi } from "@/app/requests";
+
 require("../polyfill");
 
 import { useState, useEffect } from "react";
@@ -31,7 +33,7 @@ import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
 import { api } from "../client/api";
-import { useAccessStore, useWebsiteConfigStore } from "../store";
+import { useAccessStore, useAuthStore, useWebsiteConfigStore } from "../store";
 
 export function Loading(props: {
   noLogo?: boolean;
@@ -261,14 +263,20 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
 
 export function useLoadData() {
   const config = useAppConfig();
-
+  const authStore = useAuthStore();
   useEffect(() => {
-    (async () => {
-      const models = await api.llm.models();
-      config.mergeModels(models);
-    })();
+    if (authStore.token) {
+      (async () => {
+        const models = await api.llm.models();
+        config.mergeModels(models);
+        let userConfigResult = await requestGetSettingApi();
+        if (userConfigResult.code === 0) {
+          config.overrideConfig(userConfigResult.data);
+        }
+      })();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authStore.token]);
 }
 
 export function Home() {

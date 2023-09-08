@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { trimTopic } from "../utils";
-
 import Locale, { getLang } from "../locales";
+
 import { showToast } from "../components/ui-lib";
 import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { createEmptyMask, Mask } from "./mask";
@@ -27,7 +26,7 @@ import {
 } from "../requests";
 
 export type ChatMessage = RequestMessage & {
-  date: string;
+  date: string | undefined;
   streaming?: boolean;
   isError?: boolean;
   id: string;
@@ -57,7 +56,7 @@ export interface ChatSession {
   memoryPrompt: string;
   messages: ChatMessage[];
   stat: ChatStat;
-  lastUpdate: string;
+  lastUpdate: string | undefined;
   lastSummarizeIndex: number;
   clearContextIndex?: number;
 
@@ -467,8 +466,9 @@ export const useChatStore = create<ChatStore>()(
         // in-context prompts
         const contextPrompts = session.mask.context.slice();
 
+        //TODO 这里不要加
         // system prompts, to get close to OpenAI Web ChatGPT
-        const shouldInjectSystemPrompts = modelConfig.enableInjectSystemPrompts;
+        const shouldInjectSystemPrompts = false; //modelConfig.enableInjectSystemPrompts;
         const systemPrompts = shouldInjectSystemPrompts
           ? [
               createMessage({

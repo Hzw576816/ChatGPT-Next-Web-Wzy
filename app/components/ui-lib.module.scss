@@ -467,6 +467,10 @@
       border-bottom-left-radius: 12px;
       border-bottom-right-radius: 12px;
       position: relative;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       .item {
         display: flex;
         align-items: center;

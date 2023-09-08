@@ -4,6 +4,7 @@ import { Mask } from "@/app/store/mask";
 import { getClientConfig } from "@/app/config/client";
 import { DEFAULT_API_HOST } from "@/app/constant";
 import authStore from "@/app/store/auth";
+import { ChatSession } from "@/app/store";
 
 export interface CallResult {
   code: number;
@@ -287,4 +288,29 @@ export async function requestPointToPayApi(
  */
 export async function requestGetMemberApi(): Promise<CallResult> {
   return request("/app/user/get-member", "POST", {});
+}
+
+/**
+ * 修改聊天会话标题
+ * @param session
+ */
+export async function requestUpdateSessionApi(
+  session: ChatSession,
+): Promise<CallResult> {
+  return request("/app/v1/chat/update-session", "POST", { ...session });
+}
+
+/**
+ * 获取用户设置
+ */
+export async function requestGetSettingApi(): Promise<CallResult> {
+  return request("/app/user-setting/get", "POST", {});
+}
+
+/**
+ * 设置用户配置
+ * @param config
+ */
+export async function requestSetSettingApi(config: any): Promise<CallResult> {
+  return request("/app/user-setting/set", "POST", { ...config });
 }

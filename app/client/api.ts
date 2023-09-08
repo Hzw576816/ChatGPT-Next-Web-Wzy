@@ -1,13 +1,13 @@
 import { getClientConfig } from "../config/client";
 import { ACCESS_CODE_PREFIX } from "../constant";
-import { ChatMessage, ModelType, useAccessStore, useAuthStore } from "../store";
+import { ChatMessage, useAuthStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
 
-export const Models = ["gpt-3.5-turbo", "gpt-4"] as const;
-export type ChatModel = ModelType;
+// export const Models = ["gpt-3.5-turbo", "gpt-4"] as const;
+// export type ChatModel = ModelType;
 
 export interface RequestMessage {
   role: MessageRole;

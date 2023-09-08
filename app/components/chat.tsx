@@ -48,6 +48,7 @@ import {
   useAppConfig,
   DEFAULT_TOPIC,
   ModelType,
+  ChatSession,
 } from "../store";
 
 import {
@@ -91,6 +92,7 @@ import { prettyObject } from "../utils/format";
 import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
 import { Loading } from "@/app/components/home";
+import { requestUpdateSessionApi } from "@/app/requests";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -553,6 +555,23 @@ export function EditMessageModal(props: { onClose: () => void }) {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
   const [messages, setMessages] = useState(session.messages.slice());
+  const [title, setTitle] = useState(session.topic);
+
+  function updateSession(session: ChatSession) {
+    messages.forEach((row) => (row.date = undefined));
+    requestUpdateSessionApi({
+      ...session,
+      topic: title,
+      messages: messages,
+      lastUpdate: undefined,
+    }).then((result) => {
+      chatStore.updateCurrentSession((session) => {
+        session.messages = messages;
+        session.topic = title;
+      });
+      props.onClose();
+    });
+  }
 
   return (
     <div className="modal-mask">
@@ -574,10 +593,7 @@ export function EditMessageModal(props: { onClose: () => void }) {
             icon={<ConfirmIcon />}
             key="ok"
             onClick={() => {
-              chatStore.updateCurrentSession(
-                (session) => (session.messages = messages),
-              );
-              props.onClose();
+              updateSession(session);
             }}
           />,
         ]}
@@ -589,12 +605,8 @@ export function EditMessageModal(props: { onClose: () => void }) {
           >
             <input
               type="text"
-              value={session.topic}
-              onInput={(e) =>
-                chatStore.updateCurrentSession(
-                  (session) => (session.topic = e.currentTarget.value),
-                )
-              }
+              value={title}
+              onInput={(e) => setTitle(e.currentTarget.value)}
             ></input>
           </ListItem>
         </List>
@@ -741,7 +753,7 @@ function _Chat() {
       const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
       session.messages.forEach((m) => {
         // check if should stop all stale messages
-        if (m.isError || new Date(m.date).getTime() < stopTiming) {
+        if (m.isError || new Date(m.date || "").getTime() < stopTiming) {
           if (m.streaming) {
             m.streaming = false;
           }
@@ -1263,7 +1275,7 @@ function _Chat() {
                   <div className={styles["chat-message-action-date"]}>
                     {isContext
                       ? Locale.Chat.IsContext
-                      : message.date.toLocaleString()}
+                      : message.date?.toLocaleString()}
                   </div>
                 </div>
               </div>

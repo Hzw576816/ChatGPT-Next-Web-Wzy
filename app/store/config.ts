@@ -21,7 +21,7 @@ export enum Theme {
 }
 
 export const DEFAULT_CONFIG = {
-  submitKey: SubmitKey.CtrlEnter as SubmitKey,
+  submitKey: SubmitKey.Enter as SubmitKey,
   avatar: "1f603",
   fontSize: 14,
   theme: Theme.Dark as Theme,
@@ -60,6 +60,7 @@ export type ChatConfigStore = ChatConfig & {
   update: (updater: (config: ChatConfig) => void) => void;
   mergeModels: (newModels: LLMModel[]) => void;
   allModels: () => LLMModel[];
+  overrideConfig: (config: ChatConfig) => void;
 };
 
 export type ModelConfig = ChatConfig["modelConfig"];
@@ -106,7 +107,9 @@ export const useAppConfig = create<ChatConfigStore>()(
       reset() {
         set(() => ({ ...DEFAULT_CONFIG }));
       },
-
+      overrideConfig(config) {
+        set(() => config);
+      },
       update(updater) {
         const config = { ...get() };
         updater(config);

@@ -31,6 +31,7 @@ interface Balance {
   statusText: string;
   title: string;
   attrs: any[];
+  isUseUp: boolean;
 }
 
 export function Balance(props: { isProfile?: boolean }) {
@@ -109,6 +110,7 @@ export function Balance(props: { isProfile?: boolean }) {
           balanceList.map((item) => {
             return (
               <BalanceListItem
+                isUseUp={item.isUseUp}
                 attrs={item.attrs}
                 key={item.id}
                 createTime={item.creationTime}

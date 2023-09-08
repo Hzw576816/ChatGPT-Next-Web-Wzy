@@ -30,6 +30,8 @@ import {
   useUpdateStore,
   useAccessStore,
   useAppConfig,
+  DEFAULT_CONFIG,
+  ChatConfig,
 } from "../store";
 
 import Locale, {
@@ -49,6 +51,7 @@ import { Avatar, AvatarPicker } from "./emoji";
 import { getClientConfig } from "../config/client";
 import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
+import { requestSetSettingApi } from "@/app/requests";
 
 function EditPromptModal(props: { id: string; onClose: () => void }) {
   const promptStore = usePromptStore();
@@ -318,7 +321,6 @@ export function Settings() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const config = useAppConfig();
   const updateConfig = config.update;
-
   const updateStore = useUpdateStore();
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const currentVersion = updateStore.formatVersion(updateStore.version);
@@ -388,6 +390,23 @@ export function Settings() {
 
   const clientConfig = useMemo(() => getClientConfig(), []);
   const showAccessCode = enabledAccessControl && !clientConfig?.isApp;
+
+  function updateUserSetting(userConfig: ChatConfig) {
+    const filteredConfig: {} = Object.keys(DEFAULT_CONFIG).reduce(
+      (acc, key) => {
+        if (userConfig.hasOwnProperty(key)) {
+          // @ts-ignore
+          acc[key] = userConfig[key];
+        }
+        return acc;
+      },
+      {},
+    );
+    requestSetSettingApi(filteredConfig as ChatConfig).then((r) => {
+      console.log(r);
+    });
+  }
+
   return (
     <ErrorBoundary>
       <div className="window-header" data-tauri-drag-region>
@@ -413,27 +432,27 @@ export function Settings() {
       </div>
       <div className={styles["settings"]}>
         <List>
-          <ListItem title={Locale.Settings.Avatar}>
-            <Popover
-              onClose={() => setShowEmojiPicker(false)}
-              content={
-                <AvatarPicker
-                  onEmojiClick={(avatar: string) => {
-                    updateConfig((config) => (config.avatar = avatar));
-                    setShowEmojiPicker(false);
-                  }}
-                />
-              }
-              open={showEmojiPicker}
-            >
-              <div
-                className={styles.avatar}
-                onClick={() => setShowEmojiPicker(true)}
-              >
-                <Avatar avatar={config.avatar} />
-              </div>
-            </Popover>
-          </ListItem>
+          {/*<ListItem title={Locale.Settings.Avatar}>*/}
+          {/*  <Popover*/}
+          {/*    onClose={() => setShowEmojiPicker(false)}*/}
+          {/*    content={*/}
+          {/*      <AvatarPicker*/}
+          {/*        onEmojiClick={(avatar: string) => {*/}
+          {/*          updateConfig((config) => (config.avatar = avatar));*/}
+          {/*          setShowEmojiPicker(false);*/}
+          {/*        }}*/}
+          {/*      />*/}
+          {/*    }*/}
+          {/*    open={showEmojiPicker}*/}
+          {/*  >*/}
+          {/*    <div*/}
+          {/*      className={styles.avatar}*/}
+          {/*      onClick={() => setShowEmojiPicker(true)}*/}
+          {/*    >*/}
+          {/*      <Avatar avatar={config.avatar} />*/}
+          {/*    </div>*/}
+          {/*  </Popover>*/}
+          {/*</ListItem>*/}
 
           {/*<ListItem*/}
           {/*    title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}*/}
@@ -463,12 +482,12 @@ export function Settings() {
           <ListItem title={Locale.Settings.SendKey}>
             <Select
               value={config.submitKey}
-              onChange={(e) => {
-                updateConfig(
-                  (config) =>
-                    (config.submitKey = e.target.value as any as SubmitKey),
-                );
-              }}
+              onChange={(e) =>
+                updateConfig((config) => {
+                  config.submitKey = e.target.value as any as SubmitKey;
+                  updateUserSetting(config);
+                })
+              }
             >
               {Object.values(SubmitKey).map((v) => (
                 <option value={v} key={v}>
@@ -481,11 +500,12 @@ export function Settings() {
           <ListItem title={Locale.Settings.Theme}>
             <Select
               value={config.theme}
-              onChange={(e) => {
-                updateConfig(
-                  (config) => (config.theme = e.target.value as any as Theme),
-                );
-              }}
+              onChange={(e) =>
+                updateConfig((config) => {
+                  config.theme = e.target.value as any as Theme;
+                  updateUserSetting(config);
+                })
+              }
             >
               {Object.values(Theme).map((v) => (
                 <option value={v} key={v}>
@@ -521,10 +541,10 @@ export function Settings() {
               max="18"
               step="1"
               onChange={(e) =>
-                updateConfig(
-                  (config) =>
-                    (config.fontSize = Number.parseInt(e.currentTarget.value)),
-                )
+                updateConfig((config) => {
+                  config.fontSize = Number.parseInt(e.currentTarget.value);
+                  updateUserSetting(config);
+                })
               }
             ></InputRange>
           </ListItem>
@@ -537,10 +557,10 @@ export function Settings() {
               type="checkbox"
               checked={config.enableAutoGenerateTitle}
               onChange={(e) =>
-                updateConfig(
-                  (config) =>
-                    (config.enableAutoGenerateTitle = e.currentTarget.checked),
-                )
+                updateConfig((config) => {
+                  config.enableAutoGenerateTitle = e.currentTarget.checked;
+                  updateUserSetting(config);
+                })
               }
             ></input>
           </ListItem>
@@ -553,10 +573,10 @@ export function Settings() {
               type="checkbox"
               checked={config.sendPreviewBubble}
               onChange={(e) =>
-                updateConfig(
-                  (config) =>
-                    (config.sendPreviewBubble = e.currentTarget.checked),
-                )
+                updateConfig((config) => {
+                  config.sendPreviewBubble = e.currentTarget.checked;
+                  updateUserSetting(config);
+                })
               }
             ></input>
           </ListItem>
@@ -571,11 +591,10 @@ export function Settings() {
               type="checkbox"
               checked={!config.dontShowMaskSplashScreen}
               onChange={(e) =>
-                updateConfig(
-                  (config) =>
-                    (config.dontShowMaskSplashScreen =
-                      !e.currentTarget.checked),
-                )
+                updateConfig((config) => {
+                  config.dontShowMaskSplashScreen = !e.currentTarget.checked;
+                  updateUserSetting(config);
+                })
               }
             ></input>
           </ListItem>
@@ -588,10 +607,10 @@ export function Settings() {
               type="checkbox"
               checked={config.hideBuiltinMasks}
               onChange={(e) =>
-                updateConfig(
-                  (config) =>
-                    (config.hideBuiltinMasks = e.currentTarget.checked),
-                )
+                updateConfig((config) => {
+                  config.hideBuiltinMasks = e.currentTarget.checked;
+                  updateUserSetting(config);
+                })
               }
             ></input>
           </ListItem>
@@ -606,10 +625,10 @@ export function Settings() {
               type="checkbox"
               checked={config.disablePromptHint}
               onChange={(e) =>
-                updateConfig(
-                  (config) =>
-                    (config.disablePromptHint = e.currentTarget.checked),
-                )
+                updateConfig((config) => {
+                  config.disablePromptHint = e.currentTarget.checked;
+                  updateUserSetting(config);
+                })
               }
             ></input>
           </ListItem>
@@ -648,62 +667,62 @@ export function Settings() {
             <></>
           )}
 
-          {!accessStore.hideUserApiKey ? (
-            <>
-              <ListItem
-                title={Locale.Settings.Endpoint.Title}
-                subTitle={Locale.Settings.Endpoint.SubTitle}
-              >
-                <input
-                  type="text"
-                  value={accessStore.openaiUrl}
-                  placeholder="https://api.openai.com/"
-                  onChange={(e) =>
-                    accessStore.updateOpenAiUrl(e.currentTarget.value)
-                  }
-                ></input>
-              </ListItem>
-              <ListItem
-                title={Locale.Settings.Token.Title}
-                subTitle={Locale.Settings.Token.SubTitle}
-              >
-                <PasswordInput
-                  value={accessStore.token}
-                  type="text"
-                  placeholder={Locale.Settings.Token.Placeholder}
-                  onChange={(e) => {
-                    accessStore.updateToken(e.currentTarget.value);
-                  }}
-                />
-              </ListItem>
-            </>
-          ) : null}
+          {/*{!accessStore.hideUserApiKey ? (*/}
+          {/*    <>*/}
+          {/*        <ListItem*/}
+          {/*            title={Locale.Settings.Endpoint.Title}*/}
+          {/*            subTitle={Locale.Settings.Endpoint.SubTitle}*/}
+          {/*        >*/}
+          {/*            <input*/}
+          {/*                type="text"*/}
+          {/*                value={accessStore.openaiUrl}*/}
+          {/*                placeholder="https://api.openai.com/"*/}
+          {/*                onChange={(e) =>*/}
+          {/*                    accessStore.updateOpenAiUrl(e.currentTarget.value)*/}
+          {/*                }*/}
+          {/*            ></input>*/}
+          {/*        </ListItem>*/}
+          {/*        <ListItem*/}
+          {/*            title={Locale.Settings.Token.Title}*/}
+          {/*            subTitle={Locale.Settings.Token.SubTitle}*/}
+          {/*        >*/}
+          {/*            <PasswordInput*/}
+          {/*                value={accessStore.token}*/}
+          {/*                type="text"*/}
+          {/*                placeholder={Locale.Settings.Token.Placeholder}*/}
+          {/*                onChange={(e) => {*/}
+          {/*                    accessStore.updateToken(e.currentTarget.value);*/}
+          {/*                }}*/}
+          {/*            />*/}
+          {/*        </ListItem>*/}
+          {/*    </>*/}
+          {/*) : null}*/}
 
-          {!accessStore.hideBalanceQuery && false ? (
-            <ListItem
-              title={Locale.Settings.Usage.Title}
-              subTitle={
-                showUsage
-                  ? loadingUsage
-                    ? Locale.Settings.Usage.IsChecking
-                    : Locale.Settings.Usage.SubTitle(
-                        usage?.used ?? "[?]",
-                        usage?.subscription ?? "[?]",
-                      )
-                  : Locale.Settings.Usage.NoAccess
-              }
-            >
-              {!showUsage || loadingUsage ? (
-                <div />
-              ) : (
-                <IconButton
-                  icon={<ResetIcon></ResetIcon>}
-                  text={Locale.Settings.Usage.Check}
-                  onClick={() => checkUsage(true)}
-                />
-              )}
-            </ListItem>
-          ) : null}
+          {/*{!accessStore.hideBalanceQuery && false ? (*/}
+          {/*    <ListItem*/}
+          {/*        title={Locale.Settings.Usage.Title}*/}
+          {/*        subTitle={*/}
+          {/*            showUsage*/}
+          {/*                ? loadingUsage*/}
+          {/*                    ? Locale.Settings.Usage.IsChecking*/}
+          {/*                    : Locale.Settings.Usage.SubTitle(*/}
+          {/*                        usage?.used ?? "[?]",*/}
+          {/*                        usage?.subscription ?? "[?]",*/}
+          {/*                    )*/}
+          {/*                : Locale.Settings.Usage.NoAccess*/}
+          {/*        }*/}
+          {/*    >*/}
+          {/*        {!showUsage || loadingUsage ? (*/}
+          {/*            <div/>*/}
+          {/*        ) : (*/}
+          {/*            <IconButton*/}
+          {/*                icon={<ResetIcon></ResetIcon>}*/}
+          {/*                text={Locale.Settings.Usage.Check}*/}
+          {/*                onClick={() => checkUsage(true)}*/}
+          {/*            />*/}
+          {/*        )}*/}
+          {/*    </ListItem>*/}
+          {/*) : null}*/}
 
           <ListItem
             title={Locale.Settings.CustomModel.Title}
@@ -714,9 +733,10 @@ export function Settings() {
               value={config.customModels}
               placeholder="model1,model2,model3"
               onChange={(e) =>
-                config.update(
-                  (config) => (config.customModels = e.currentTarget.value),
-                )
+                config.update((config) => {
+                  config.customModels = e.currentTarget.value;
+                  updateUserSetting(config);
+                })
               }
             ></input>
           </ListItem>
@@ -730,7 +750,10 @@ export function Settings() {
             updateConfig={(updater) => {
               const modelConfig = { ...config.modelConfig };
               updater(modelConfig);
-              config.update((config) => (config.modelConfig = modelConfig));
+              config.update((config) => {
+                config.modelConfig = modelConfig;
+                updateUserSetting(config);
+              });
             }}
           />
         </List>

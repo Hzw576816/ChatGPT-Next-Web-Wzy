@@ -713,6 +713,7 @@ export function BalanceListItem(props: {
   status: string;
   statusText: string;
   attrs?: any[];
+  isUseUp: boolean;
 }) {
   return (
     <div className={styles["order-list-item"] + " " + styles[props.status]}>
@@ -720,7 +721,9 @@ export function BalanceListItem(props: {
         <div className={styles["header"]}>
           <div className={styles["title"]}>{props.title}</div>
           <div className={styles["right"]}>
-            <div className={styles["r-title"]}>到期时间: {props.endTime}</div>
+            <div className={styles["r-title"]}>
+              到期时间: {props.endTime || "永久有效"}
+            </div>
             <div className={styles["sub-title"]}>
               购买时间: {props.createTime}
             </div>
@@ -747,9 +750,13 @@ export function BalanceListItem(props: {
           })}
         </div>
       </div>
-      <div className={styles["order-status"] + " " + props.status}>
-        {props.statusText}
-      </div>
+      {!props.isUseUp ? (
+        <div className={styles["order-status"] + " " + props.status}>
+          {props.statusText}
+        </div>
+      ) : (
+        <div className={styles["order-status"] + " " + "expired"}>已用完</div>
+      )}
     </div>
   );
 }
