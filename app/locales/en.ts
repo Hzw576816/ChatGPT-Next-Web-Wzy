@@ -14,6 +14,14 @@ const en: LocaleType = {
     Login: "您已登录，请点击下方「重试」按钮",
     Exception: "请求异常，请点击下方「重试」按钮",
   },
+  PointsChangePage: {
+    Title: "积分记录",
+    NoRecords: "暂无记录",
+  },
+  ListModelsPage: {
+    Title: "模型说明",
+    NoRecords: "暂无数据",
+  },
   PricingPage: {
     Title: "购买套餐",
     SubTitle: "畅享与AI聊天的乐趣",
@@ -121,6 +129,8 @@ const en: LocaleType = {
       CreateInviteCode: "生成邀请码",
       Copy: "复制链接",
       Redeem: "兑换码",
+      PointsChangeRecords: "积分记录",
+      Models: "模型说明",
     },
     BalanceItem: {
       Title: "套餐类型",

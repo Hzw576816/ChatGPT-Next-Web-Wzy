@@ -111,6 +111,16 @@ export function Profile() {
                 }}
               />
             </ListItem>
+            <ListItem subTitle="会话模型所需积分请点击右侧按钮查看">
+              <IconButton
+                text={Locale.Profile.Actions.Models}
+                type="second"
+                style={{ flexShrink: 0 }}
+                onClick={() => {
+                  navigate(Path.Models);
+                }}
+              />
+            </ListItem>
           </List>
         )}
         <Balance isProfile></Balance>
@@ -133,6 +143,16 @@ export function Profile() {
               type="second"
               onClick={() => {
                 navigate(Path.Order);
+              }}
+            />
+          </ListItem>
+          <ListItem>
+            <IconButton
+              text={Locale.Profile.Actions.PointsChangeRecords}
+              block={true}
+              type="second"
+              onClick={() => {
+                navigate(Path.PointsRecords);
               }}
             />
           </ListItem>

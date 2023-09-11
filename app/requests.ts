@@ -314,3 +314,17 @@ export async function requestGetSettingApi(): Promise<CallResult> {
 export async function requestSetSettingApi(config: any): Promise<CallResult> {
   return request("/app/user-setting/set", "POST", { ...config });
 }
+
+/**
+ * 获取积分记录
+ */
+export async function requestPointsChangeRecordsApi(): Promise<CallResult> {
+  return request("/app/user/list-points-records", "POST", {});
+}
+
+/**
+ * 获取模型说明
+ */
+export async function requestGptModelsListApi(): Promise<CallResult> {
+  return request("/app/v1/chat/list-models", "POST", {});
+}

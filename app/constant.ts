@@ -26,6 +26,8 @@ export enum Path {
   Balance = "/balance",
   WxLogin = "/wxLogin",
   TransitScan = "/transit-scan",
+  PointsRecords = "/points-records",
+  Models = "/models",
 }
 
 export enum SlotID {

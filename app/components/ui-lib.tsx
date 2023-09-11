@@ -10,6 +10,7 @@ import CancelIcon from "../icons/cancel.svg";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
 import PinIcon from "../icons/pin.svg";
+import LightNingImg from "../icons/lightning.png";
 import WxPayImg from "../icons/wx-pay.png";
 import pointPayImg from "../icons/point-pay.png";
 import Locale from "../locales";
@@ -757,6 +758,72 @@ export function BalanceListItem(props: {
       ) : (
         <div className={styles["order-status"] + " " + "expired"}>已用完</div>
       )}
+    </div>
+  );
+}
+
+export function PointsChangeRecordsItem(props: {
+  title: string;
+  time: string;
+  points: number;
+  label?: string;
+  isDeduct: boolean;
+}) {
+  return (
+    <div className={styles["points-change-records"]}>
+      <div className={styles["container"]}>
+        <div className={styles["header"]}>
+          <div className={styles["title"]}>{props.title}</div>
+          <div className={styles["right"]}>
+            <div className={styles["points"]}>
+              {props.isDeduct ? "- " : "+ "}
+              {props.points}
+            </div>
+            <div className={styles["sub-title"]}>变动时间: {props.time}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ListModelsItem(props: {
+  points: number;
+  alias: string;
+  inputPrice?: number;
+  name: string;
+  outputPrice?: number;
+}) {
+  return (
+    <div className={styles["list-models-item"]}>
+      <div className={styles["container"]}>
+        <div className={styles["header"]}>
+          <div className={styles["title"]}>
+            <div className={styles["main-title"]}>
+              <div className="label">模型：</div>
+              <div className={styles["value"]}>{props.name}</div>
+            </div>
+            <div className={styles["sub-title"]}>
+              <div className="label">所属：</div>
+              <div className={styles["value"]}>{props.alias}</div>
+            </div>
+          </div>
+          <div className={styles["right"]}>
+            <div className="icon">
+              <NextImage
+                src={LightNingImg.src}
+                width={28}
+                height={28}
+                alt="light"
+              />
+            </div>
+            <div className={styles["points"]}>{props.points}</div>
+          </div>
+          {/*<div className={styles["title-des"]}>*/}
+          {/*    询问每次消耗{props.points}(当询问携带超长文本时,可能会按照实际计算)*/}
+          {/*</div>*/}
+        </div>
+      </div>
     </div>
   );
 }

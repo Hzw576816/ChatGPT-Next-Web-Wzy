@@ -106,6 +106,20 @@ const TransitScan = dynamic(
   },
 );
 
+const PointsRecords = dynamic(
+  async () => (await import("./points-records")).PointsRecords,
+  {
+    loading: () => <Loading noLogo logoLoading />,
+  },
+);
+
+const ListModels = dynamic(
+  async () => (await import("./list-models")).ListModels,
+  {
+    loading: () => <Loading noLogo logoLoading />,
+  },
+);
+
 const WxLogin = dynamic(async () => (await import("./wx-login")).WxLogin, {
   loading: () => <Loading noLogo logoLoading />,
 });
@@ -252,6 +266,8 @@ function Screen(props: { logoLoading: boolean; logoUrl?: string }) {
                 <Route path={Path.Profile} element={<Profile />} />
                 <Route path={Path.WxLogin} element={<WxLogin />} />
                 <Route path={Path.TransitScan} element={<TransitScan />} />
+                <Route path={Path.PointsRecords} element={<PointsRecords />} />
+                <Route path={Path.Models} element={<ListModels />} />
               </Routes>
             </div>
           </>
@@ -270,7 +286,7 @@ export function useLoadData() {
         const models = await api.llm.models();
         config.mergeModels(models);
         let userConfigResult = await requestGetSettingApi();
-        if (userConfigResult.code === 0) {
+        if (userConfigResult.code === 0 && userConfigResult.data) {
           config.overrideConfig(userConfigResult.data);
         }
       })();
