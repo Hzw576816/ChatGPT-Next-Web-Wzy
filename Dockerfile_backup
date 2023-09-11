@@ -1,17 +1,44 @@
 FROM node:18-alpine AS base
-# 创建目录
+RUN echo "http://mirrors.aliyun.com/alpine/v3.14/main/" > /etc/apk/repositories && echo "http://mirrors.aliyun.com/alpine/v3.14/community/" >> /etc/apk/repositories
+
+FROM base AS deps
+
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /app
 
-COPY publish/public ./public
-COPY publish/standalone ./
-COPY publish/static ./.next/static
-COPY publish/server ./.next/server
+COPY package.json yarn.lock ./
+
+RUN yarn config set registry 'https://registry.npmmirror.com/'
+RUN yarn install
+
+FROM base AS builder
+
+RUN apk update && apk add --no-cache git
+
+ENV OPENAI_API_KEY=""
+ENV CODE=""
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+RUN yarn build
+
+FROM base AS runner
+WORKDIR /app
+
+RUN apk add proxychains-ng
 
 ENV PROXY_URL=""
 ENV OPENAI_API_KEY=""
 ENV CODE=""
 ENV HIDE_USER_API_KEY=1
 ENV HIDE_BALANCE_QUERY=1
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/server ./.next/server
 
 EXPOSE 3000
 
