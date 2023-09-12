@@ -537,8 +537,30 @@
     }
   }
   .points-change-records {
+    .container {
+      .header {
+        flex-wrap: wrap;
+        .title {
+          width: 100%;
+        }
+
+        .right {
+        }
+      }
+    }
   }
   .list-models-item {
+    .container {
+      .header {
+        .title {
+          width: 75%;
+        }
+
+        .right {
+
+        }
+      }
+    }
   }
 }
 
